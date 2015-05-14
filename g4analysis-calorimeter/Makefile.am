@@ -1,44 +1,68 @@
 AUTOMAKE_OPTIONS = foreign
 
+AM_CXXFLAGS=-std=c++0x
+
 # List of shared libraries to produce
 lib_LTLIBRARIES = \
-    libg4ana_calorimeter.la
-
-AM_LDFLAGS = \
-    -L$(libdir) \
-    -L$(OFFLINE_MAIN)/lib
+  libg4ana_calo.la
 
 INCLUDES = \
-    -I$(includedir) \
-    -I$(OFFLINE_MAIN)/include \
-    -I$(ROOTSYS)/include \
-    -I${G4_MAIN}/include \
-    -I${G4_MAIN}/include/Geant4
+  -I$(includedir) \
+  -isystem $(OFFLINE_MAIN)/include \
+  -isystem $(ROOTSYS)/include
 
-libg4ana_calorimeter_la_LIBADD = \
-  -lphool \
-  -lSubsysReco \
-  -lg4testbench \
-  -lCGAL
+RINCLUDES = \
+  -I$(includedir) \
+  -I$(OFFLINE_MAIN)/include \
+  -I$(ROOTSYS)/include
 
-pkginclude_HEADERS = \
-  G4CaloShowerAnalysis.h \
-  G4CaloTowerAnalysis.h
-
-libg4ana_calorimeter_la_SOURCES = \
+libg4ana_calo_la_SOURCES = \
+  G4AnaCalo_Dict.C \
   G4CaloShowerAnalysis.cc \
   G4CaloTowerAnalysis.cc
+
+
+libg4ana_calo_la_LDFLAGS = \
+  -L$(libdir) \
+  -L$(OFFLINE_MAIN)/lib
+
+libg4ana_calo_la_LIBADD = \
+  -lphool \
+  -lSubsysReco \
+  -lg4detectors \
+  -lgsl \
+  -lgslcblas
+
+G4AnaCalo_Dict.C: \
+  G4CaloShowerAnalysis.h \
+  G4CaloTowerAnalysis.h \
+  G4AnaCaloLinkDef.h
+	rootcint -f $@ -c $(DEFAULT_INCLUDES) $(RINCLUDES) $^
+
+#################################################
+#### please add new classes in alphabetical order
+###
+###pkginclude_HEADERS = \
+###  RawCluster.h \
+###  RawClusterContainer.h \
+###  RawTower.h \
+###  RawTowerv1.h \
+###  RawTowerv2.h \
+###  RawTowerContainer.h \
+###  RawTowerGeom.h
+###
 
 ################################################
 # linking tests
 
 noinst_PROGRAMS = \
-  testexternals_g4ana_calorimeter
+  testexternals_g4ana 
 
-testexternals_g4ana_calorimeter_SOURCES = testexternals.cc
-testexternals_g4ana_calorimeter_LDADD = libg4ana_calorimeter.la
+testexternals_g4ana_SOURCES = testexternals.C
+testexternals_g4ana_LDADD = libg4ana_calo.la
 
-testexternals.cc:
+
+testexternals.C:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@
 	echo "int main()" >> $@
 	echo "{" >> $@
@@ -50,10 +74,3 @@ testexternals.cc:
 
 clean-local:
 	rm -f *Dict* $(BUILT_SOURCES)
-
-G4Analysis_Calorimeter_Dict.cc : \
-  G4CaloShowerAnalysis.h \
-  G4CaloTowerAnalysis.h \
-  G4CaloAnalysisLinkDef.h
-	rootcint -f $@ -c $(DEFAULT_INCLUDES) $(INCLUDES) $^
-
