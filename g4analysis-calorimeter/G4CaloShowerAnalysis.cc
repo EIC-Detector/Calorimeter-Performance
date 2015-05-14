@@ -29,11 +29,15 @@ G4CaloShowerAnalysis::G4CaloShowerAnalysis(const std::string name , const std::s
   _g4hits(NULL),
   _filename(filename),
   _node_name_truth("G4TruthInfo"),
-  _nevent(0)
+  _nevent(0),
+  _store_esum(false),
+  _h_esum(NULL),
+  _store_lprof(false),
+  _h_lprof(NULL),
+  _store_rprof(false),
+  _h_rprof(NULL)
 {
-  _store_esum = false;
-  _store_lprof = false;
-  _store_rprof = false;
+
 }
 
 G4CaloShowerAnalysis::~G4CaloShowerAnalysis()
@@ -150,6 +154,7 @@ int G4CaloShowerAnalysis::process_event( PHCompositeNode* topNode )
 
 int G4CaloShowerAnalysis::End(PHCompositeNode * topNode)
 {
+
   /* Select output file */
   _outfile->cd();
 

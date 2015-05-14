@@ -30,9 +30,11 @@ G4CaloTowerAnalysis::G4CaloTowerAnalysis(const std::string name , const std::str
   _tower(NULL),
   _filename(filename),
   _node_name_truth("G4TruthInfo"),
-  _nevent(0)
+  _nevent(0),
+  _store_esum(false),
+  _h_esum(NULL)
 {
-  _store_esum = false;
+
 }
 
 G4CaloTowerAnalysis::~G4CaloTowerAnalysis()
@@ -120,6 +122,7 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
 
 int G4CaloTowerAnalysis::End(PHCompositeNode * topNode)
 {
+
   /* Select output file */
   _outfile->cd();
 
