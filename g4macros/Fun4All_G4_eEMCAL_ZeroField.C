@@ -1,5 +1,5 @@
 int
-Fun4All_G4_eECAL_ZeroField(
+Fun4All_G4_eEMCAL_ZeroField(
 			   int nEvents = 10,
 			   const char * outputFile = "G4ePHENIX_e-_p10_eta-2_detailed_TEST.root",
 			   const char * ptype = "e-",
@@ -10,7 +10,7 @@ Fun4All_G4_eECAL_ZeroField(
 			   )
 {
 
-  cout << "Run Fun4All_G4_eECAL_ZeroField with... " << endl;
+  cout << "Run Fun4All_G4_eEMCAL_ZeroField with... " << endl;
   cout << "... nEvents = " << nEvents << endl;
   cout << "... particle type = " << ptype << endl;
   cout << "... momentum (min) = " << ppmin << endl;
@@ -33,7 +33,7 @@ Fun4All_G4_eECAL_ZeroField(
   gSystem->Load("libg4ana_calo.so"); // calorimeter analysis
 
   /* Choose detector configuration */
-  gROOT->LoadMacro("G4Setup_eECAL.C");
+  gROOT->LoadMacro("G4Setup_eEMCAL.C");
   G4Init(); // initialize layer numbers
 
   //---------------
@@ -67,8 +67,8 @@ Fun4All_G4_eECAL_ZeroField(
   //----------------------
   // G4Hit analysis for Calorimeter
   //----------------------
-  G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eECAL" , "G4Shower_eECAL.root" );
-  showerAnalysis->AddG4HitNode("G4HIT_eECAL");
+  G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eEMCAL" , "G4Shower_eEMCAL.root" );
+  showerAnalysis->AddG4HitNode("G4HIT_eEMCAL");
   showerAnalysis->SetStoreESum( true , 100 , 0 , 20 );
 
   se->registerSubsystem(showerAnalysis);
