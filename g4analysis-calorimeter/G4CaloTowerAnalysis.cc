@@ -6,10 +6,7 @@
 
 /* PHG4 includes */
 #include <g4main/PHG4TruthInfoContainer.h>
-
 #include <g4main/PHG4Particle.h>
-//#include <g4main/PHMCTowerContainerV1.h>
-//#include <g4main/PHMCTower.h>
 
 /* Fun4All includes */
 #include <fun4all/Fun4AllHistoManager.h>
@@ -86,29 +83,30 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   /* Loop over all input nodes for tower */
   for (unsigned i = 0; i < nnodes; i++)
     {
-//      PHMCTowerContainer *_tower = findNode::getClass<PHMCTowerContainerV1>(topNode, _node_tower_names.at(i).c_str());
-//
-//      if (_tower)
-//	{
-//	  unsigned ntower = _tower->size();
-//
-//	  for ( unsigned itower = 0; itower < ntower; itower++ )
-//	    {
-//	      PHMCTower *tower = _tower->getTower(itower);
-//
-//	      double energyT = tower->GetEt();
-//	      double eta = tower->GetEta();
-//	      //double phi = tower->GetPhi();
-//
-//	      double pz = energyT * sinh( eta );
-//	      double energy = sqrt( energyT * energyT + pz * pz );
-//
-//	      event_esum += energy;
-//
-//	      /* Store single-tower values */
-//	      // ...
-//	    }
-//	}
+      RawTowerContainer *_tower = findNode::getClass<RawTowerContainer>(topNode, _node_tower_names.at(i).c_str());
+
+      if (_tower)
+	{
+
+	  /* loop over all towers in the event from this container */
+	  RawTowerContainer::ConstIterator towerit;
+	  RawTowerContainer::ConstRange towers_begin_end = _tower->getTowers();
+
+	  RawTowerv1* tower_i = NULL;
+
+	  for (towerit = towers_begin_end.first; towerit != towers_begin_end.second; towerit++)
+	    {
+	      /* Get raw tower and energy */
+	      tower_i= dynamic_cast<RawTowerv1*>( (*towerit).second );
+	      double energy = tower_i->get_energy();
+
+	      event_esum += energy;
+
+	      /* Store single-tower values */
+	      // ...
+
+	    }
+	}
     }
 
   /* Store full-event values */

@@ -1,6 +1,10 @@
 #ifndef _G4_CALO_TOWER_ANALYSIS_H_
 #define _G4_CALO_TOWER_ANALYSIS_H_
 
+/*g4cemc includes */
+#include <g4cemc/RawTowerv1.h>
+#include <g4cemc/RawTowerContainer.h>
+
 /* STL includes */
 #include <string>
 #include <vector>
@@ -11,9 +15,11 @@
 /* Forward declerations */
 class PHCompositeNode;
 class PHG4TruthInfoContainer;
-class PHMCTower;
-class PHMCTowerContainerV1;
 class Fun4AllHistoManager;
+
+class RawTower;
+class RawTowerv1;
+class RawTowerContainer;
 
 class TFile;
 class TH1F;
@@ -64,7 +70,7 @@ protected:
   TFile *_outfile;
 
   PHG4TruthInfoContainer *_truth_info_container;
-  PHMCTowerContainerV1 *_tower;
+  RawTowerContainer *_tower;
 
   std::string _filename;
   std::string _node_name_truth;
