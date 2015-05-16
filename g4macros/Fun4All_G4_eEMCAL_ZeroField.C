@@ -69,9 +69,36 @@ Fun4All_G4_eEMCAL_ZeroField(
   //----------------------
   G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eEMCAL" , "G4Shower_eEMCAL.root" );
   showerAnalysis->AddG4HitNode("G4HIT_eEMCAL");
-  showerAnalysis->SetStoreESum( true , 100 , 0 , 20 );
+  showerAnalysis->SetStoreESum( true , 1001 , -0.005 , 10.005 );
 
   se->registerSubsystem(showerAnalysis);
+
+
+  //----------------------
+  // Build Calorimeter Tower
+  //----------------------
+  CrystalCalorimeterTowerBuilder* tower_eEMCAL = new CrystalCalorimeterTowerBuilder();
+  tower_eEMCAL->Detector("eEMCAL");
+
+  se->registerSubsystem(tower_eEMCAL);
+
+  //----------------------
+  // Digitization
+  //----------------------
+  CrystalCalorimeterDigitization* digi_eEMCAL = new CrystalCalorimeterDigitization("CrystalCalorimeterDigitization","TOWER_eEMCAL","TDIGI_eEMCAL");
+
+  se->registerSubsystem(digi_eEMCAL);
+
+
+  //----------------------
+  // Tower analysis for Calorimeter
+  //----------------------
+  G4CaloTowerAnalysis* towerAnalysis = new G4CaloTowerAnalysis( "TowerAna_eEMCAL" , "TowerAna_eEMCAL.root" );
+  towerAnalysis->AddTowerNode("TOWER_eEMCAL");
+  towerAnalysis->SetStoreESum( true , 1001 , -0.005 , 10.005 );
+
+  se->registerSubsystem(towerAnalysis);
+
 
   //--------------
   // IO management
