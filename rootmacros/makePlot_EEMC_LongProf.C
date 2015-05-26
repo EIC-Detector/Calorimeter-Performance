@@ -4,7 +4,6 @@
  * \author Thomas Krahulik <thomas.karhulik@stonybrook.edu>
  */
 
-/
 
 int makePlot_EEMC_LongProf(
 		       const TString infile_e_p5 = "/direct/phenix+u/tkrahul/EIC_tkrahulik_work/analysis/G4ePHENIX_EEMC_Simulations/RootSimulations/G4ePHENIX_EEMC_e-_p5_eta-2_detailed_100.root",
