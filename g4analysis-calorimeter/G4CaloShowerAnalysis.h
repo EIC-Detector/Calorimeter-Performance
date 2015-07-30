@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+#include "TCanvas.h"
+#include "TGraph.h"
+
 /* Fun4All includes */
 #include <fun4all/SubsysReco.h>
 
@@ -17,6 +20,7 @@ class Fun4AllHistoManager;
 
 class TFile;
 class TH1F;
+class TGraph;
 
 /** Analyze G4Hits in calorimeter, calculate shower parameters and store information in ROOT output file.
  *
@@ -58,6 +62,17 @@ class G4CaloShowerAnalysis : public SubsysReco
     _h_esum_xmax = h_xmax;
   }
 
+  /* Switch on and define parameters for the comparison of the energy between two G4Hit Nodes */
+  void SetComparison( bool onoff , const std::string &name ) {
+    _comparison = onoff;
+    _comparison_node_name = name;
+  }
+
+  void SetComparisonSum( bool onoff , const std::string &name ) {
+    _comparison_sum = onoff;
+    _comparison_sum_node_name = name;
+  }
+
   /* Switch on and define parameters for histogram storing average logitudinal shower profile */
   void SetStoreLProf( bool onoff , int h_nbins , float h_xmin , float h_xmax ) {
     _store_lprof = onoff;
@@ -93,6 +108,14 @@ protected:
   int _h_esum_bins;
   int _h_esum_xmin;
   int _h_esum_xmax;
+
+  bool _comparison;
+  std::string _comparison_node_name;
+  TGraph *_compare_esum;
+
+  bool _comparison_sum;
+  std::string _comparison_sum_node_name;
+  TGraph *_compare_sum_esum;
 
   bool _store_lprof;
   TH1F* _h_lprof;

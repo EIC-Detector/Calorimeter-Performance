@@ -32,6 +32,10 @@ G4CaloShowerAnalysis::G4CaloShowerAnalysis(const std::string name , const std::s
   _nevent(0),
   _store_esum(false),
   _h_esum(NULL),
+  _comparison(false),
+  _compare_esum(NULL),
+  _comparison_sum(false),
+  _compare_sum_esum(NULL),
   _store_lprof(false),
   _h_lprof(NULL),
   _store_rprof(false),
@@ -56,6 +60,19 @@ int G4CaloShowerAnalysis::Init( PHCompositeNode* topNode )
       _h_esum = new TH1F( "h_esum" , "" ,  _h_esum_bins, _h_esum_xmin, _h_esum_xmax );
       _h_esum->GetXaxis()->SetTitle("E [GeV]");
       _h_esum->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
+    }
+
+  /* Book histogram for total energy sum */
+  if ( _comparison )
+    {
+      _compare_esum = new TGraph();
+      _compare_esum->SetName("h_compare");
+    }
+
+  if ( _comparison_sum )
+    {
+      _compare_sum_esum = new TGraph();
+      _compare_sum_esum->SetName("h_compare_sum");
     }
 
   /* Book histogram for longitudinal shower profile */
@@ -146,8 +163,60 @@ int G4CaloShowerAnalysis::process_event( PHCompositeNode* topNode )
   /* Store full-event values */
   if ( _store_esum )
     {
+      //cout << "Energy stored: Normal! Energy: "<< event_esum << endl;
       _h_esum->Fill( event_esum );
     }
+
+  float garbage_collection_energy = 0.0;
+
+  if (_comparison)
+   {
+      float event_esum_abs = 0;
+      PHG4HitContainer *_g4hits_2 = findNode::getClass<PHG4HitContainer>(topNode, _comparison_node_name.c_str());
+
+      if (_g4hits_2)
+	{
+	  PHG4HitContainer::ConstRange hit_range_2 = _g4hits_2->getHits();
+
+	  for (PHG4HitContainer::ConstIterator hit_iter_2 = hit_range_2.first ; hit_iter_2 !=  hit_range_2.second; hit_iter_2++ )
+	    {
+	      float edep_2 = hit_iter_2->second->get_edep();
+	      event_esum_abs += edep_2;
+	    }
+	}
+
+      garbage_collection_energy = event_esum_abs;
+
+      //cout << "Energy stored: Envelope! Energy: "<< event_esum_abs << endl;
+      _compare_esum->SetPoint( _nevent - 1 , event_esum , event_esum_abs );
+
+   }
+
+  if (_comparison_sum)
+   {
+      float event_esum_ding = 0;
+      PHG4HitContainer *_g4hits_3 = findNode::getClass<PHG4HitContainer>(topNode, _comparison_sum_node_name.c_str());
+
+      if (_g4hits_3)
+	{
+	  PHG4HitContainer::ConstRange hit_range_3 = _g4hits_3->getHits();
+
+	  for (PHG4HitContainer::ConstIterator hit_iter_3 = hit_range_3.first ; hit_iter_3 !=  hit_range_3.second; hit_iter_3++ )
+	    {
+	      float edep_3 = hit_iter_3->second->get_edep();
+	      event_esum_ding += edep_3;
+	    }
+	}
+
+      //cout << "Energy stored: Carbon Fiber! Energy: "<< event_esum_ding << endl;
+      //cout << "Total Energy: "<< event_esum_ding + event_esum + garbage_collection_energy << endl;
+      //cout << "****************************************"<< endl << endl;
+      event_esum_ding = event_esum_ding + garbage_collection_energy;
+
+      //cout << "Energy stored: Garbage! Energy: "<< event_esum_abs << endl;
+      _compare_sum_esum->SetPoint( _nevent - 1 , event_esum , event_esum_ding );
+
+   }
 
   return 0;
 }
@@ -161,6 +230,12 @@ int G4CaloShowerAnalysis::End(PHCompositeNode * topNode)
   /* Write histograms to output file */
   if ( _h_esum )
     _h_esum->Write();
+
+  if ( _comparison )
+    _compare_esum->Write();
+
+  if ( _comparison_sum )
+    _compare_sum_esum->Write();
 
   if ( _h_lprof )
     _h_lprof->Write();
