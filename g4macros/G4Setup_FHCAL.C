@@ -32,9 +32,18 @@ G4Setup(const int absorberactive = 0, const float field = 0)
 
   g4Reco->set_field(field); // use const solenoid field
 
+
+  /** Use dedicated FHCAL module */
   PHG4ForwardHcalSubsystem *hhcal = new PHG4ForwardHcalSubsystem("FHCAL");
   hhcal->OverlapCheck(overlapcheck);
   g4Reco->registerSubsystem( hhcal );
+
+
+  /** Use cone objects to build sampling calorimeter */
+  //gROOT->LoadMacro("G4_FHcal.C");
+  //FHCalInit();
+  //G4_FHCal(g4Reco, 350.0, 1.1, 5.0, 100.);
+
 
   /**
    * 'spy' tracking layer infront of calorimeter to capture particle positions right before they
