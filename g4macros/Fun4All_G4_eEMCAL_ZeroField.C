@@ -5,8 +5,8 @@ Fun4All_G4_eEMCAL_ZeroField(
 			   const char * ptype = "e-",
 			   float ppmin = 10,
 			   float ppmax = 10,
-			   float petamin = -2,
-			   float petamax = -2
+			   float petamin = -2.0,
+			   float petamax = -2.0
 			   )
 {
 
@@ -52,8 +52,9 @@ Fun4All_G4_eEMCAL_ZeroField(
   gen->set_vtx(0, 0, 0);
   gen->set_z_range(0, 0);
   gen->set_eta_range(petamin, petamax);
-  gen->set_phi_range(TMath::Pi() / 2, TMath::Pi() / 2);
-  //gen->set_phi_range( 0, 2 * TMath::Pi() );
+  gen->set_phi_range(TMath::Pi() / 4.0 , TMath::Pi() / 4.0 );
+  //gen->set_phi_range(TMath::Pi() / 2, TMath::Pi() / 2 );
+  //gen->set_phi_range( 0 , 2 * TMath::Pi() );
   gen->set_mom_range(ppmin, ppmax); // 1 10 20 50
   // gen->Verbosity(1);
 
@@ -67,13 +68,36 @@ Fun4All_G4_eEMCAL_ZeroField(
   //----------------------
   // G4Hit analysis for Calorimeter
   //----------------------
-  G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eEMCAL" , "G4Shower_eEMCAL.root" );
-  showerAnalysis->AddG4HitNode("G4HIT_eEMCAL");
-  showerAnalysis->SetStoreESum( true , 1001 , -0.005 , 10.005 );
 
+  ostringstream name;
+  name.str("");
+  name << "G4Shower_eEMCAL_Default" << "_p_"<< ppmin << "_" << ppmax << "_GeV" << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+  G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eEMCAL" , name.str().c_str() );
+  showerAnalysis->AddG4HitNode("G4HIT_eEMCAL");
+  showerAnalysis->SetStoreESum( true , 4001 , -0.005 , 40.005 );
+  showerAnalysis->SetComparison( true , "G4HIT_ENVELOPE_ENVELOPE" );
+  showerAnalysis->SetComparisonSum( true , "G4HIT_ABSORBER_eEMCAL" );
+  
   se->registerSubsystem(showerAnalysis);
 
+  //-----------------------------------------
+  //
+  //
+/*
+  ostringstream new_name;
+  new_name.str("");
+  new_name << "G4Shower_ENVELOPE_eEMCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV" << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
 
+  G4CaloShowerAnalysis* absorberAnalysis = new G4CaloShowerAnalysis( "G4Shower_ENVELOPE_ENVELOPE" , new_name.str().c_str() );
+  absorberAnalysis->AddG4HitNode("G4HIT_ENVELOPE_ENVELOPE");
+  absorberAnalysis->SetStoreESum( true , 40001 , -0.005 , 40.005 );
+
+  se->registerSubsystem(absorberAnalysis);
+*/
+  //-----------------------------------------
+
+/*
   //----------------------
   // Build Calorimeter Tower
   //----------------------
@@ -93,12 +117,18 @@ Fun4All_G4_eEMCAL_ZeroField(
   //----------------------
   // Tower analysis for Calorimeter
   //----------------------
-  G4CaloTowerAnalysis* towerAnalysis = new G4CaloTowerAnalysis( "TowerAna_eEMCAL" , "TowerAna_eEMCAL.root" );
+
+  ostringstream name_2;
+  name_2.str("");
+  name_2 << "TowerAna_eEMCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV" << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+  G4CaloTowerAnalysis* towerAnalysis = new G4CaloTowerAnalysis( "TowerAna_eEMCAL" , name_2.str().c_str() );
   towerAnalysis->AddTowerNode("TOWER_eEMCAL");
-  towerAnalysis->SetStoreESum( true , 1001 , -0.005 , 10.005 );
+//  towerAnalysis->AddTowerNode("TDIGI_eEMCAL");
+  towerAnalysis->SetStoreESum( true , 10000001 , -0.005 , 10000000.005 );
 
   se->registerSubsystem(towerAnalysis);
-
+*/
 
   //--------------
   // IO management
@@ -114,8 +144,15 @@ Fun4All_G4_eEMCAL_ZeroField(
   if (nEvents <= 1)
     {
       PHG4Reco *g4 = (PHG4Reco *) se->getSubsysReco("PHG4RECO");
-      //      g4->StartGui();
+      //g4->StartGui();
       g4->ApplyCommand("/control/execute eic.mac");
+/*
+      g4->ApplyCommand("/vis/open DAWNFILE");
+      g4->ApplyCommand("/vis/drawVolume");
+      g4->ApplyCommand("/vis/viewer/flush");
+      g4->ApplyCommand("/vis/scene/add/trajectories");
+      g4->ApplyCommand("/vis/scene/add/hits");
+*/   
       se->run(1);
 
       se->End();
@@ -131,7 +168,7 @@ Fun4All_G4_eEMCAL_ZeroField(
           g4->ApplyCommand("/control/verbose 5");
           g4->ApplyCommand("/run/verbose  5");
           g4->ApplyCommand("/tracking/verbose 5");
-        }
+       }
 
       se->run(nEvents);
 
