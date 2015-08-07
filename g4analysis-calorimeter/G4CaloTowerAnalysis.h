@@ -2,8 +2,8 @@
 #define _G4_CALO_TOWER_ANALYSIS_H_
 
 /*g4cemc includes */
-#include <g4cemc/RawTowerv1.h>
-#include <g4cemc/RawTowerContainer.h>
+#include <g4cemc/CaloTowerv1.h>
+#include <g4cemc/CaloTowerContainer.h>
 
 /* STL includes */
 #include <string>
@@ -17,9 +17,9 @@ class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class Fun4AllHistoManager;
 
-class RawTower;
-class RawTowerv1;
-class RawTowerContainer;
+class CaloTower;
+class CaloTowerv1;
+class CaloTowerContainer;
 
 class TFile;
 class TH1F;
@@ -70,7 +70,7 @@ protected:
   TFile *_outfile;
 
   PHG4TruthInfoContainer *_truth_info_container;
-  RawTowerContainer *_tower;
+  CaloTowerContainer *_tower;
 
   std::string _filename;
   std::string _node_name_truth;
