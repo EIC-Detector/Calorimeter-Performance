@@ -30,15 +30,15 @@ makeGeo_EEMC()
   // make eemc envelope
   TGeoVolume *eemc_geo = gm->MakeCone( "eemc", med, eemc_dz/2., eemc_rmin1, eemc_rmax1, eemc_rmin2, eemc_rmax2 );
 
-  TGeoTranslation eemc_t(0,0,400);
+  TGeoTranslation eemc_t(0,0,-108.);
   TGeoHMatrix *eemc_tm = new TGeoHMatrix(eemc_t);
 
   top->AddNode( eemc_geo , 1 , eemc_tm );
 
   // make eemc tower
-  float tower_dx = 10.0; // cm
-  float tower_dy = 10.0; // cm
-  float tower_dz = 100.0; // cm
+  float tower_dx = 2.0; // cm
+  float tower_dy = 2.0; // cm
+  float tower_dz = 18.0; // cm
 
   TGeoVolume *tower_geo = gm->MakeBox("TowerX",med,tower_dx/2. , tower_dy/2. , tower_dz/2. ); 
   tower_geo->SetLineColor(kRed);

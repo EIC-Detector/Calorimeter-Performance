@@ -19,8 +19,8 @@ makeMapping_EEMC()
   float tower_dy = tower_dx;
   float tower_dz = crystal_length; // cm
 
-  // all towers at fixed z position which is 1/2 towerlength
-  float zpos = tower_dz / 2.;
+  // all towers at fixed z position in CENTER of mother volume
+  float zpos = 0;
 
   unsigned n_towers_j = 100;
   unsigned n_towers_k = n_towers_j;
@@ -41,7 +41,7 @@ makeMapping_EEMC()
   ofstream fout("towerMap_EEMC_latest.txt");
   fout << "#idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],alpha,beta,gamma,type" << endl;
 
-  float r_min = 5.0;//eemc_rmin2;
+  float r_min = eemc_rmin2;
   float r_max = eemc_rmax1;
   float tower_r = sqrt(  tower_dx * tower_dx + tower_dy * tower_dy );
 

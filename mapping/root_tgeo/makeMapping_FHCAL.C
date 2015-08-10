@@ -9,8 +9,8 @@ makeMapping_FHCAL()
   float tower_dy = 10.0; // cm
   float tower_dz = 100.0; // cm
 
-  // all towers at fixed z position which is 1/2 towerlength
-  float zpos = tower_dz / 2.;
+  // all towers at fixed z position which is center of mother volume
+  float zpos = 0;
 
   // assume center tower is centered at (0,0)
   // find index of 'theoretical' center tower on chessboard
