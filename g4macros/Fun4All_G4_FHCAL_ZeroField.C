@@ -83,8 +83,7 @@ Fun4All_G4_FHCAL_ZeroField(
   //----------------------
   // Build Calorimeter Tower
   //----------------------
-  CaloTowerBuilderByHitIndex* tower_FHCAL = new CaloTowerBuilderByHitIndex();
-
+  CrystalCalorimeterTowerBuilder* tower_FHCAL = new CrystalCalorimeterTowerBuilder();
   tower_FHCAL->Detector("FHCAL");
 
   se->registerSubsystem(tower_FHCAL);

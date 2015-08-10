@@ -83,21 +83,21 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   /* Loop over all input nodes for tower */
   for (unsigned i = 0; i < nnodes; i++)
     {
-      CaloTowerContainer *_tower = findNode::getClass<CaloTowerContainer>(topNode, _node_tower_names.at(i).c_str());
+      RawTowerContainer *_tower = findNode::getClass<RawTowerContainer>(topNode, _node_tower_names.at(i).c_str());
 
       if (_tower)
 	{
 
 	  /* loop over all towers in the event from this container */
-	  CaloTowerContainer::ConstIterator towerit;
-	  CaloTowerContainer::ConstRange towers_begin_end = _tower->getTowers();
+	  RawTowerContainer::ConstIterator towerit;
+	  RawTowerContainer::ConstRange towers_begin_end = _tower->getTowers();
 
-	  CaloTowerv1* tower_i = NULL;
+	  RawTowerv1* tower_i = NULL;
 
 	  for (towerit = towers_begin_end.first; towerit != towers_begin_end.second; towerit++)
 	    {
 	      /* Get raw tower and energy */
-	      tower_i= dynamic_cast<CaloTowerv1*>( (*towerit).second );
+	      tower_i= dynamic_cast<RawTowerv1*>( (*towerit).second );
 	      double energy = tower_i->get_energy();
 
 	      event_esum += energy;

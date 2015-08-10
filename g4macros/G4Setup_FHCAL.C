@@ -35,12 +35,20 @@ G4Setup(const int absorberactive = 0, const float field = 0)
 
   /** Use dedicated FHCAL module */
   PHG4ForwardHcalSubsystem *hhcal = new PHG4ForwardHcalSubsystem("FHCAL");
+
+  ostringstream mapping_hhcal;
+  mapping_hhcal << "calibrations/ForwardHcal/mapping/towerMap_FHCAL_v001.txt";
+
+    //  mapping_hhcal << getenv("OFFLINE_MAIN") <<
+    //    "/share/calibrations/ForwardHcal/mapping/towerMap_hHcal_v0.txt";
+  cout << mapping_hhcal.str() << endl;
+  hhcal->SetTowerMappingFile( mapping_hhcal.str() );
   hhcal->OverlapCheck(overlapcheck);
   g4Reco->registerSubsystem( hhcal );
 
 
   /** Use cone objects to build sampling calorimeter */
-  //gROOT->LoadMacro("G4_FHcal.C");
+  //gROOT->LoadMacro("G4_FHcal_Cone.C");
   //FHCalInit();
   //G4_FHCal(g4Reco, 350.0, 1.1, 5.0, 100.);
 
