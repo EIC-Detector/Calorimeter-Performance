@@ -1,9 +1,6 @@
 using namespace std;
 
 // global macro parameters
-double Min_forward_eta = 1.15;
-
-double no_overlapp = 0.0001; // added to radii to avoid overlapping volumes
 bool overlapcheck = false; // set to true if you want to check for overlaps
 
 void
@@ -37,13 +34,13 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   PHG4ForwardHcalSubsystem *hhcal = new PHG4ForwardHcalSubsystem("FHCAL");
 
   ostringstream mapping_hhcal;
-  mapping_hhcal << "calibrations/ForwardHcal/mapping/towerMap_FHCAL_v001.txt";
-
-    //  mapping_hhcal << getenv("OFFLINE_MAIN") <<
-    //    "/share/calibrations/ForwardHcal/mapping/towerMap_hHcal_v0.txt";
+  mapping_hhcal << getenv("OFFLINE_MAIN") <<
+    "/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v001.txt";
   cout << mapping_hhcal.str() << endl;
+
   hhcal->SetTowerMappingFile( mapping_hhcal.str() );
   hhcal->OverlapCheck(overlapcheck);
+
   g4Reco->registerSubsystem( hhcal );
 
 
