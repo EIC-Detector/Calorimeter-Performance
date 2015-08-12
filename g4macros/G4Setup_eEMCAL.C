@@ -42,7 +42,7 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   ostringstream mapping_eecal;
   //mapping_eecal << "calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v001.txt";
   mapping_eecal << getenv("OFFLINE_MAIN") <<
-    "/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v001.txt";
+    "/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v001.txt";
   cout << mapping_eecal.str() << endl;
   eecal->SetTowerMappingFile( mapping_eecal.str() );
 
