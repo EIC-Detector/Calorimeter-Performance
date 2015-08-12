@@ -101,7 +101,7 @@ Fun4All_G4_eEMCAL_ZeroField(
   //----------------------
   // Build Calorimeter Tower
   //----------------------
-  CrystalCalorimeterTowerBuilder* tower_EEMC = new CrystalCalorimeterTowerBuilder();
+  CaloTowerBuilderByHitIndex* tower_EEMC = new CaloTowerBuilderByHitIndex();
   tower_EEMC->Detector("EEMC");
 
   se->registerSubsystem(tower_EEMC);
