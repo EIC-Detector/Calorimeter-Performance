@@ -1,7 +1,7 @@
 int
 Fun4All_G4_FHCAL_ZeroField(
-			   int nEvents = 2,
-			   const char * outputFile = "G4ePHENIX_e-_p10_eta-2_detailed_TEST.root",
+			   int nEvents = 10,
+			   const char * outputFile = "G4FHCAL_e-_p10_eta-2_detailed_TEST.root",
 			   const char * ptype = "e-",
 			   float ppmin = 10,
 			   float ppmax = 10,
@@ -83,8 +83,7 @@ Fun4All_G4_FHCAL_ZeroField(
   //----------------------
   // Build Calorimeter Tower
   //----------------------
-  CaloTowerBuilderByHitIndex* tower_FHCAL = new CaloTowerBuilderByHitIndex();
-
+  CrystalCalorimeterTowerBuilder* tower_FHCAL = new CrystalCalorimeterTowerBuilder();
   tower_FHCAL->Detector("FHCAL");
 
   se->registerSubsystem(tower_FHCAL);

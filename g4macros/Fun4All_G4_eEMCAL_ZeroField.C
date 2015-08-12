@@ -30,7 +30,7 @@ Fun4All_G4_eEMCAL_ZeroField(
   gSystem->Load("libfun4all.so"); // core library
   gSystem->Load("libg4detectors.so"); // detector modules
   gSystem->Load("libcemc.so"); // tower, digitization etc for calorimeter
-  gSystem->Load("libg4ana_calo.so"); // calorimeter analysis
+  //  gSystem->Load("libg4ana_calo.so"); // calorimeter analysis
 
   /* Choose detector configuration */
   gROOT->LoadMacro("G4Setup_eEMCAL.C");
@@ -69,17 +69,17 @@ Fun4All_G4_eEMCAL_ZeroField(
   // G4Hit analysis for Calorimeter
   //----------------------
 
-  ostringstream name;
-  name.str("");
-  name << "G4Shower_eEMCAL_Default" << "_p_"<< ppmin << "_" << ppmax << "_GeV" << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
-
-  G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eEMCAL" , name.str().c_str() );
-  showerAnalysis->AddG4HitNode("G4HIT_eEMCAL");
-  showerAnalysis->SetStoreESum( true , 4001 , -0.005 , 40.005 );
-  showerAnalysis->SetComparison( true , "G4HIT_ENVELOPE_ENVELOPE" );
-  showerAnalysis->SetComparisonSum( true , "G4HIT_ABSORBER_eEMCAL" );
-  
-  se->registerSubsystem(showerAnalysis);
+//  ostringstream name;
+//  name.str("");
+//  name << "G4Shower_eEMCAL_Default" << "_p_"<< ppmin << "_" << ppmax << "_GeV" << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+//
+//  G4CaloShowerAnalysis* showerAnalysis = new G4CaloShowerAnalysis( "G4Shower_eEMCAL" , name.str().c_str() );
+//  showerAnalysis->AddG4HitNode("G4HIT_eEMCAL");
+//  showerAnalysis->SetStoreESum( true , 4001 , -0.005 , 40.005 );
+//  showerAnalysis->SetComparison( true , "G4HIT_ENVELOPE_ENVELOPE" );
+//  showerAnalysis->SetComparisonSum( true , "G4HIT_ABSORBER_eEMCAL" );
+//  
+//  se->registerSubsystem(showerAnalysis);
 
   //-----------------------------------------
   //
