@@ -36,10 +36,32 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   //  electron going detectors
   /////////////////////////////////////////////////
 
-  PHG4CrystalCalorimeterSubsystem *eecal = new PHG4CrystalCalorimeterSubsystem("eEMCAL");
+  PHG4CrystalCalorimeterSubsystem *eecal = new PHG4CrystalCalorimeterSubsystem("EEMC");
+
+  /* Use non-projective geometry */
+  ostringstream mapping_eecal;
+  mapping_eecal << "calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v001.txt";
+//  //  mapping_eecal << getenv("OFFLINE_MAIN") <<
+//    //    "/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v001.txt";
+  cout << mapping_eecal.str() << endl;
+  eecal->SetTowerMappingFile( mapping_eecal.str() );
+
+
+  /* Use projective geometry */
+  //ostringstream mapping_eecal;
+  //mapping_eecal << "/direct/phenix+u/jlab/github/sPHENIX-Fork/calibrations/CrystalCalorimeter/mapping/crystals_v005.txt";
+  //ostringstream mapping_eecal_2;
+  //mapping_eecal_2 << "/direct/phenix+u/jlab/github/sPHENIX-Fork/calibrations/CrystalCalorimeter/mapping/4_by_4_construction_v005.txt";
+  //
+  //eecal->SetProjectiveGeometry( mapping_eecal.str() , mapping_eecal_2.str() );
+
+
+  /* register Ecal module */
   eecal->OverlapCheck(overlapcheck);
   g4Reco->registerSubsystem( eecal );
 
+
+  /* 'Envelope' detector to catch leaing energy */
   PHG4EnvelopeSubsystem *envelope = new PHG4EnvelopeSubsystem("ENVELOPE");
   envelope->OverlapCheck(overlapcheck);
   g4Reco->registerSubsystem( envelope );
