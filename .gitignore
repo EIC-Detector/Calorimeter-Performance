@@ -1,3 +1,6 @@
+# data files
+*.root
+
 # http://www.gnu.org/software/automake
 
 Makefile.in
