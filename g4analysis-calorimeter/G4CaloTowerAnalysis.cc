@@ -8,6 +8,9 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 
+#include <g4cemc/CaloTowerID.h>
+#include <g4cemc/CaloTowerGeomManager.h>
+
 /* Fun4All includes */
 #include <fun4all/Fun4AllHistoManager.h>
 #include <fun4all/Fun4AllReturnCodes.h>
@@ -105,6 +108,36 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
 	      /* Store single-tower values */
 	      // ...
 
+	      /* Print tower and neighbor information */
+	      if ( _nevent == 1 )
+		{
+		  unsigned int towerid = tower_i->get_id();
+		  cout << "*** Event #" << _nevent << " Tower ("
+		       << calotowerid::DecodeCalorimeterName( towerid ) << " , "
+		       << calotowerid::DecodeTowerIndex1( towerid ) << " , "
+		       << calotowerid::DecodeTowerIndex2( towerid ) << ") : "
+		       << tower_i->get_energy() <<  endl;
+
+		  /* Get geometry manager for calorimeter towers */
+		  CaloTowerGeomManager *geoman = CaloTowerGeomManager::instance();
+		  vector< unsigned int > v_tower_neighbors = geoman->GetNeighbors( towerid );
+
+		  for ( unsigned i = 0; i < v_tower_neighbors.size(); i++ )
+		    {
+		      /* energy of neighbo tower */
+		      float e_neighbor = 0;
+
+		      /* Check if neighbor tower has energy deposit */
+		      if ( (_tower->getTower( v_tower_neighbors.at( i ) )) )
+			e_neighbor = (_tower->getTower( v_tower_neighbors.at( i ) ))->get_energy();
+
+		      cout << "* Adjacent Tower ("
+			   << calotowerid::DecodeCalorimeterName( v_tower_neighbors.at( i ) ) << " , "
+			   << calotowerid::DecodeTowerIndex1( v_tower_neighbors.at( i ) ) << " , "
+			   << calotowerid::DecodeTowerIndex2( v_tower_neighbors.at( i ) ) << ") : "
+			   << e_neighbor << endl;
+		    }
+		}
 	    }
 	}
     }
