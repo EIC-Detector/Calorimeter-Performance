@@ -1,3 +1,5 @@
+#include "/direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include/g4cemc/CaloTowerID.h"
+
 int
 Fun4All_G4_FHCAL_ZeroField(
 			   int nEvents = 10,
@@ -84,7 +86,7 @@ Fun4All_G4_FHCAL_ZeroField(
   // Build Calorimeter Tower
   //----------------------
   CaloTowerBuilderByHitIndex* tower_FHCAL = new CaloTowerBuilderByHitIndex();
-  tower_FHCAL->Detector("FHCAL");
+  tower_FHCAL->Detector("FHCAL", calotowerid::FHCAL);
 
   se->registerSubsystem(tower_FHCAL);
 

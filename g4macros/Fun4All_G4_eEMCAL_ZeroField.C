@@ -1,3 +1,5 @@
+#include "/direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include/g4cemc/CaloTowerID.h"
+
 int
 Fun4All_G4_eEMCAL_ZeroField(
 			   int nEvents = 10,
@@ -102,7 +104,7 @@ Fun4All_G4_eEMCAL_ZeroField(
   // Build Calorimeter Tower
   //----------------------
   CaloTowerBuilderByHitIndex* tower_EEMC = new CaloTowerBuilderByHitIndex();
-  tower_EEMC->Detector("EEMC");
+  tower_EEMC->Detector("EEMC", calotowerid::EEMC);
 
   se->registerSubsystem(tower_EEMC);
 

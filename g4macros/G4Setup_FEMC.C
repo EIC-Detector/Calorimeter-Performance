@@ -1,3 +1,5 @@
+#include "/direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include/g4cemc/CaloTowerID.h"
+
 using namespace std;
 
 // global macro parameters
@@ -34,9 +36,14 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   PHG4ForwardEcalSubsystem *femc = new PHG4ForwardEcalSubsystem("FEMC");
 
   ostringstream mapping_femc;
-  //  mapping_femc << "calibrations/ForwardEcal/mapping/towerMap_FEMC_v001.txt";
-  mapping_femc << getenv("OFFLINE_MAIN") <<
-    "/share/calibrations/ForwardEcal/mapping/towerMap_FEMC_v001.txt";
+
+  /* path to local copy of calibrations repository */
+  //mapping_femc << "calibrations";
+
+  /* path to central copy of calibrations repositry */
+  mapping_femc << getenv("OFFLINE_MAIN") << "/share/calibrations";
+
+  mapping_femc << "/ForwardEcal/mapping/towerMap_FEMC_v002.txt";
   cout << mapping_femc.str() << endl;
 
   femc->SetTowerMappingFile( mapping_femc.str() );
@@ -50,6 +57,8 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   //FEcalInit();
   //G4_FEcal(g4Reco, 350.0, 1.1, 5.0, 100.);
 
+  CaloTowerGeomManager* geoman = CaloTowerGeomManager::instance();
+  geoman->ReadGeometryFromTable( calotowerid::FEMC , mapping_femc.str() );
 
   /**
    * 'spy' tracking layer infront of calorimeter to capture particle positions right before they

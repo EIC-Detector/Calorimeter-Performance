@@ -1,3 +1,5 @@
+#include "/direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include/g4cemc/CaloTowerID.h"
+
 using namespace std;
 
 // global macro parameters
@@ -40,9 +42,9 @@ G4Setup(const int absorberactive = 0, const float field = 0)
 
   /* Use non-projective geometry */
   ostringstream mapping_eecal;
-  //mapping_eecal << "calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v001.txt";
+  //mapping_eecal << "calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v002.txt";
   mapping_eecal << getenv("OFFLINE_MAIN") <<
-    "/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v001.txt";
+    "/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v002.txt";
   cout << mapping_eecal.str() << endl;
   eecal->SetTowerMappingFile( mapping_eecal.str() );
 
@@ -59,6 +61,11 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   /* register Ecal module */
   eecal->OverlapCheck(overlapcheck);
   g4Reco->registerSubsystem( eecal );
+
+
+  /* load mapping in geometry manager */
+  CaloTowerGeomManager* geoman = CaloTowerGeomManager::instance();
+  geoman->ReadGeometryFromTable( calotowerid::EEMC , mapping_eecal.str() );
 
 
   /* 'Envelope' detector to catch leaing energy */

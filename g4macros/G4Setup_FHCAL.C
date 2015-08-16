@@ -1,3 +1,5 @@
+#include "/direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include/g4cemc/CaloTowerID.h"
+
 using namespace std;
 
 // global macro parameters
@@ -34,8 +36,14 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   PHG4ForwardHcalSubsystem *hhcal = new PHG4ForwardHcalSubsystem("FHCAL");
 
   ostringstream mapping_hhcal;
-  mapping_hhcal << getenv("OFFLINE_MAIN") <<
-    "/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v001.txt";
+
+  /* path to local copy of calibrations repository */
+  //mapping_hhcal << "calibrations";
+
+  /* path to central copy of calibrations repositry */
+  mapping_hhcal << getenv("OFFLINE_MAIN") << "/share/calibrations";
+
+  mapping_hhcal << "/ForwardHcal/mapping/towerMap_FHCAL_v002.txt";
   cout << mapping_hhcal.str() << endl;
 
   hhcal->SetTowerMappingFile( mapping_hhcal.str() );
@@ -49,6 +57,16 @@ G4Setup(const int absorberactive = 0, const float field = 0)
   //FHCalInit();
   //G4_FHCal(g4Reco, 350.0, 1.1, 5.0, 100.);
 
+
+  /* Read tower geometry on the fly
+   */
+  /** Load mapping / geometry for analysis */
+  //CaloTowerGeomReader *georead = new CaloTowerGeomReader("CaloTowerGeoRead");
+  //georead->ReadGeometryFromTable( calotowerid::FHCAL , mapping_hhcal.str() );
+  //g4Reco->registerSubsystem( georead );
+
+  CaloTowerGeomManager* geoman = CaloTowerGeomManager::instance();
+  geoman->ReadGeometryFromTable( calotowerid::FHCAL , mapping_hhcal.str() );
 
   /**
    * 'spy' tracking layer infront of calorimeter to capture particle positions right before they

@@ -84,7 +84,7 @@ Fun4All_G4_FEMC_ZeroField(
   // Build Calorimeter Tower
   //----------------------
   CaloTowerBuilderByHitIndex* tower_FEMC = new CaloTowerBuilderByHitIndex();
-  tower_FEMC->Detector("FEMC");
+  tower_FEMC->Detector("FEMC", calotowerid::FEMC);
 
   se->registerSubsystem(tower_FEMC);
 
