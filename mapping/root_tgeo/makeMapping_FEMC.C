@@ -10,7 +10,7 @@ makeMapping_FEMC()
   float tower_dz = 17.0; // cm
 
   // all towers at fixed z position which is center of mother volume
-  float zpos = 0;
+  float zpos = 315; // cm;
 
   unsigned n_towers_j = 200;
   unsigned n_towers_k = n_towers_j;
@@ -29,7 +29,7 @@ makeMapping_FEMC()
 
   // create map
   ofstream fout("towerMap_FEMC_latest.txt");
-  fout << "#idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],alpha,beta,gamma,type" << endl;
+  fout << "#idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],dx[cm],dy[cm],dz[cm],alpha,beta,gamma,type" << endl;
 
   float r_min = femc_rmin2;
   float r_max = femc_rmax1;
@@ -59,10 +59,8 @@ makeMapping_FEMC()
 	  if ( tower_r_clear_min < r_min || tower_r_clear_max > r_max )
 	    continue;
 
-	  fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " 0 0 0 0" << endl;
+	  fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0 0" << endl;
 
-	  // ideal data format:
-	  // tower_id , x , y , z , alpha , beta , gamma , towertype
 	}
 
     }

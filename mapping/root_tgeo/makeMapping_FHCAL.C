@@ -10,7 +10,7 @@ makeMapping_FHCAL()
   float tower_dz = 100.0; // cm
 
   // all towers at fixed z position which is center of mother volume
-  float zpos = 0;
+  float zpos = 400; // cm
 
   // assume center tower is centered at (0,0)
   // find index of 'theoretical' center tower on chessboard
@@ -31,7 +31,7 @@ makeMapping_FHCAL()
 
   // create map
   ofstream fout("towerMap_FHCAL_latest.txt");
-  fout << "#idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],alpha,beta,gamma,type" << endl;
+  fout << "#idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],dx[cm],dy[cm],dz[cm],alpha,beta,gamma,type" << endl;
 
   unsigned idx_l = 0;
 
@@ -64,10 +64,8 @@ makeMapping_FHCAL()
 	  if ( idx_j == j_center && idx_k == k_center )
 	    continue;
 
-	  fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " 0 0 0 0" << endl;
+	  fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0 0" << endl;
 
-	  // ideal data format:
-	  // tower_id , x , y , z , alpha , beta , gamma , towertype
 	}
 
     }

@@ -25,6 +25,7 @@ makeGeo_FHCAL()
   //  top->Draw();
 
   // The World Is Not Enough
+  float hhcal_zcenter = 400; // cm
   float hhcal_dz = 100.0; // cm
   float hhcal_rmin1 = 5.0; // cm
   float hhcal_rmax1 = 262.0; // cm
@@ -34,19 +35,10 @@ makeGeo_FHCAL()
   // make hHcal envelope
   TGeoVolume *hhcal_geo = gm->MakeCone( "hHcal", med, hhcal_dz/2., hhcal_rmin1, hhcal_rmax1, hhcal_rmin2, hhcal_rmax2 );
 
-  TGeoTranslation hhcal_t(0,0,400);
+  TGeoTranslation hhcal_t(0,0,hhcal_zcenter);
   TGeoHMatrix *hhcal_tm = new TGeoHMatrix(hhcal_t);
 
   top->AddNode( hhcal_geo , 1 , hhcal_tm );
-
-  // make hHcal tower
-  float tower_dx = 10.0; // cm
-  float tower_dy = 10.0; // cm
-  float tower_dz = 100.0; // cm
-
-  TGeoVolume *tower_geo = gm->MakeBox("TowerX",med,tower_dx/2. , tower_dy/2. , tower_dz/2. ); 
-  tower_geo->SetLineColor(kRed);
-  tower_geo->SetFillColor(kBlue);
 
   // read tower geometry from text file
   unsigned idx_j = 0;
@@ -54,7 +46,11 @@ makeGeo_FHCAL()
   unsigned idx_l = 0;
   float xpos = 0;
   float ypos = 0;
-  float zpos = 0;
+  float zpos = hhcal_zcenter;
+  float tower_dx = 0; //10.0; // cm
+  float tower_dy = 0; //10.0; // cm
+  float tower_dz = 0; //100.0; // cm
+
   float dummy = 0;
 
   ifstream in;
@@ -62,6 +58,9 @@ makeGeo_FHCAL()
   in.open("towerMap_FHCAL_latest.txt");
 
   int nlines = 0;
+
+  // make hHcal tower
+  TGeoVolume *tower_geo = NULL;
 
   while ( getline( in , line ) ) {
 
@@ -71,11 +70,20 @@ makeGeo_FHCAL()
 	continue;
       }
 
-    stringstream(line) >> idx_j >> idx_k >> idx_l >> xpos >> ypos >> zpos >> dummy >> dummy >> dummy >> dummy;
+    stringstream(line) >> idx_j >> idx_k >> idx_l >> xpos >> ypos >> zpos >> tower_dx >> tower_dy >> tower_dz >> dummy >> dummy >> dummy >> dummy;
     if ( nlines < 5 ) printf("idx_j=%d, idx_k=%d, xpos=%f, ypos=%f\n, zpos=%f\n", idx_j, idx_k, xpos, ypos, zpos);
     nlines++;
 
-    TGeoHMatrix *tower_tm = new TGeoHMatrix( TGeoTranslation( xpos, ypos, zpos ) );
+    // IF this is the first tower, make tower
+    if ( !tower_geo )
+      {
+	tower_geo = gm->MakeBox("TowerX",med,tower_dx/2. , tower_dy/2. , tower_dz/2. ); 
+	tower_geo->SetLineColor(kRed);
+	tower_geo->SetFillColor(kBlue);
+      }
+
+    // zpos = 0 because centered within mother volume = HCAL envelope
+    TGeoHMatrix *tower_tm = new TGeoHMatrix( TGeoTranslation( xpos, ypos, 0 ) );
     hhcal_geo->AddNode( tower_geo , 1 , tower_tm );
   }
 
