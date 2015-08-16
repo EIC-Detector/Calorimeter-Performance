@@ -122,6 +122,12 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
 		  CaloTowerGeomManager *geoman = CaloTowerGeomManager::instance();
 		  vector< unsigned int > v_tower_neighbors = geoman->GetNeighbors( towerid );
 
+		  float x,y,z,dx,dy,dz;
+		  geoman->GetPositionXYZ( towerid , x, y, z );
+		  geoman->GetSizeXYZ( towerid , dx, dy, dz );
+		  cout << "** Position:   x = " << x << " ,  y = " << y << " ,  z = " << z << endl;
+		  cout << "** Dimension: dx = " << dx << " , dy = " << dy << " , dz = " << dz << endl;
+
 		  for ( unsigned i = 0; i < v_tower_neighbors.size(); i++ )
 		    {
 		      /* energy of neighbo tower */
