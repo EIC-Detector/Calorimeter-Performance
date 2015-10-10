@@ -114,9 +114,22 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 		{
 		  unsigned int clusterid = cluster_i->get_id();
 		  cout << "*** Event #" << _nevent << " Cluster (" << clusterid << ") : Energy "
-		       << cluster_i->get_energy() <<  ", Volume " << cluster_i->get_volume() << endl;
+		       << cluster_i->get_energy() <<  ", Volume " << cluster_i->get_volume() << " , #Towers: " << cluster_i->getNTowers() << endl;
 
 		  cout << "** Eta = " << cluster_i->get_eta() << " ,  Phi = " << cluster_i->get_phi() << endl;
+
+		  cout << "** x,y,z = " << cluster_i->get_x() << " , " << cluster_i->get_y() << " , " << cluster_i->get_z() << endl;
+
+		  CaloCluster::TowerConstRange begin_end = cluster_i->get_towers();
+		  CaloCluster::TowerConstIterator iter;
+
+		  cout << "** Towers(Energy) included: \n";
+		  for (iter = begin_end.first; iter != begin_end.second; ++iter)
+		    {
+		      cout << (iter->first) << "(" << (iter->second) << ") \n";
+		    }
+		  cout << endl;
+
 
 		}
 	    }
