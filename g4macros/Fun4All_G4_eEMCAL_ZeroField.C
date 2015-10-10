@@ -2,7 +2,7 @@
 
 int
 Fun4All_G4_eEMCAL_ZeroField(
-			   int nEvents = 10,
+			   int nEvents = 2,
 			   const char * outputFile = "G4ePHENIX_e-_p10_eta-2_detailed_TEST.root",
 			   const char * ptype = "e-",
 			   float ppmin = 10,
@@ -44,18 +44,27 @@ Fun4All_G4_eEMCAL_ZeroField(
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(0);
 
+  recoConsts *rc = recoConsts::instance();
+  // By default every random number generator uses
+  // PHRandomSeed() which reads /dev/urandom to get its seed
+  // if the RANDOMSEED flag is set its value is taken as seed
+  // You ca neither set this to a random value using PHRandomSeed()
+  // which will make all seeds identical (not sure what the point of
+  // this would be:
+  //  rc->set_IntFlag("RANDOMSEED",PHRandomSeed());
+  // or set it to a fixed value so you can debug your code
+  rc->set_IntFlag("RANDOMSEED", 12345);
+
   //-----------------
   // Event generation
   //-----------------
   PHG4ParticleGenerator *gen = new PHG4ParticleGenerator();
-  // gen->set_seed(TRandom3(0).GetSeed()); // random seed
-  gen->set_seed(1234); // fixed seed
   gen->set_name(ptype); // e,pi,mu,p,gamma
   gen->set_vtx(0, 0, 0);
   gen->set_z_range(0, 0);
   gen->set_eta_range(petamin, petamax);
-  gen->set_phi_range(TMath::Pi() / 4.0 , TMath::Pi() / 4.0 );
-  //gen->set_phi_range(TMath::Pi() / 2, TMath::Pi() / 2 );
+  //  gen->set_phi_range(TMath::Pi() / 4.0 , TMath::Pi() / 4.0 );
+  gen->set_phi_range(TMath::Pi() / 2, TMath::Pi() / 2 );
   //gen->set_phi_range( 0 , 2 * TMath::Pi() );
   gen->set_mom_range(ppmin, ppmax); // 1 10 20 50
   // gen->Verbosity(1);
@@ -118,6 +127,14 @@ Fun4All_G4_eEMCAL_ZeroField(
   */
 
   //----------------------
+  // Build Calorimeter Cluster
+  //----------------------
+  CaloClusterBuilder* cluster_EEMC = new CaloClusterBuilder("EEMCClusterBuilder");
+  cluster_EEMC->Detector("EEMC");
+  cluster_EEMC->Verbosity(verbosity);
+  se->registerSubsystem(cluster_EEMC);
+
+  //----------------------
   // Tower analysis for Calorimeter
   //----------------------
 
@@ -128,10 +145,25 @@ Fun4All_G4_eEMCAL_ZeroField(
   G4CaloTowerAnalysis* towerAnalysis = new G4CaloTowerAnalysis( "TowerAna_EEMC" , name_2.str().c_str() );
   towerAnalysis->AddTowerNode("TOWER_EEMC");
 //  towerAnalysis->AddTowerNode("TDIGI_EEMC");
-  towerAnalysis->SetStoreESum( true , 10000001 , -0.005 , 10000000.005 );
+  towerAnalysis->SetStoreESum( true , 10001 , -0.05 , 100.05 );
 
   se->registerSubsystem(towerAnalysis);
-  
+
+
+  //----------------------
+  // Cluster analysis for Calorimeter
+  //----------------------
+
+  ostringstream name_3;
+  name_3.str("");
+  name_3 << "ClusterAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV" << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+  G4CaloClusterAnalysis* clusterAnalysis = new G4CaloClusterAnalysis( "ClusterAna_EEMC" , name_3.str().c_str() );
+  clusterAnalysis->AddClusterNode("CLUSTER_EEMC");
+  clusterAnalysis->SetStoreESum( true , 10001 , -0.05 , 100.05 );
+
+  se->registerSubsystem(clusterAnalysis);
+
 
   //--------------
   // IO management
@@ -155,7 +187,7 @@ Fun4All_G4_eEMCAL_ZeroField(
       g4->ApplyCommand("/vis/viewer/flush");
       g4->ApplyCommand("/vis/scene/add/trajectories");
       g4->ApplyCommand("/vis/scene/add/hits");
-*/   
+*/
       se->run(1);
 
       se->End();
