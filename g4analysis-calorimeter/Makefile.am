@@ -34,18 +34,21 @@ libg4ana_calo_la_LDFLAGS = \
 
 pkginclude_HEADERS = \
   G4CaloShowerAnalysis.h \
-  G4CaloTowerAnalysis.h
+  G4CaloTowerAnalysis.h \
+  G4CaloClusterAnalysis.h
 
 #pkginclude_HEADERS = $(include_HEADERS)
 
 libg4ana_calo_la_SOURCES = \
   G4AnaCalo_Dict.C \
   G4CaloShowerAnalysis.cc \
-  G4CaloTowerAnalysis.cc
+  G4CaloTowerAnalysis.cc \
+  G4CaloClusterAnalysis.cc
 
 G4AnaCalo_Dict.C : \
   G4CaloShowerAnalysis.h \
   G4CaloTowerAnalysis.h \
+  G4CaloClusterAnalysis.h \
   G4AnaCaloLinkDef.h
 	rootcint -f $@ -c $(DEFAULT_INCLUDES) $(RINCLUDES) $^
 
