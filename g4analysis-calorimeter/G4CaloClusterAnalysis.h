@@ -57,12 +57,7 @@ class G4CaloClusterAnalysis : public SubsysReco
   void AddClusterNode(const std::string &name) {_node_cluster_names.push_back(name);}
 
   /* Switch on and define parameters for histogram storing event-wise total deposited energy */
-  void SetStoreESum( bool onoff , int h_nbins , float h_xmin , float h_xmax ) {
-    _store_esum = onoff;
-    _h_esum_bins = h_nbins;
-    _h_esum_xmin = h_xmin;
-    _h_esum_xmax = h_xmax;
-  }
+  void SetStoreESum( int h_nbins , float h_xmin , float h_xmax );
 
 protected:
 
@@ -78,11 +73,7 @@ protected:
 
   int _nevent;
 
-  bool _store_esum;
   TH1F* _h_esum;
-  int _h_esum_bins;
-  int _h_esum_xmin;
-  int _h_esum_xmax;
 
 };
 

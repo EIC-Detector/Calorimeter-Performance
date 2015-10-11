@@ -31,7 +31,6 @@ G4CaloClusterAnalysis::G4CaloClusterAnalysis(const std::string name , const std:
   _filename(filename),
   _node_name_truth("G4TruthInfo"),
   _nevent(0),
-  _store_esum(false),
   _h_esum(NULL)
 {
 
@@ -47,16 +46,19 @@ int G4CaloClusterAnalysis::Init( PHCompositeNode* topNode )
   /* Create new output file */
   _outfile = new TFile(_filename.c_str(), "RECREATE");
 
-  /* Book histogram for total energy sum */
-  if ( _store_esum )
-    {
-      _h_esum = new TH1F( "h_esum" , "" ,  _h_esum_bins, _h_esum_xmin, _h_esum_xmax );
-      _h_esum->GetXaxis()->SetTitle("E [GeV]");
-      _h_esum->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
-    }
-
   return 0;
 }
+
+
+void G4CaloClusterAnalysis::SetStoreESum( int h_nbins , float h_xmin , float h_xmax )
+{
+  /* Book histogram */
+  _h_esum = new TH1F( "h_esum" , "" , h_nbins, h_xmin, h_xmax );
+  _h_esum->GetXaxis()->SetTitle("E [GeV]");
+  _h_esum->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
+}
+
+
 
 int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 {
@@ -137,7 +139,7 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
     }
 
   /* Store full-event values */
-  if ( _store_esum )
+  if ( _h_esum )
     {
       _h_esum->Fill( event_esum );
     }
