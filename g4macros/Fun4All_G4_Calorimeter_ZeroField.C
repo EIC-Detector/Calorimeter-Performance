@@ -283,7 +283,12 @@ Fun4All_G4_Calorimeter_ZeroField(
 
 	  G4CaloClusterAnalysis* clusterAna_EEMC = new G4CaloClusterAnalysis( "ClusterAna_EEMC" , fname_cluster_eemc.str().c_str() );
 	  clusterAna_EEMC->AddClusterNode("CLUSTER_EEMC");
-	  clusterAna_EEMC->SetStoreESum( true , 10001 , -0.05 , 100.05 );
+
+	  clusterAna_EEMC->SetStoreESum( 10001 , -0.05 , 100.05 );
+	  clusterAna_EEMC->SetStoreEMax( 10001 , -0.05 , 100.05 );
+	  clusterAna_EEMC->SetStoreEtaMax( 101 , -5.05 , 5.05 );
+	  clusterAna_EEMC->SetStorePhiMax( 101 , -5.05 , 5.05 );
+	  clusterAna_EEMC->SetStoreDensityMax( 1001 , -0.000005 , 0.005005 );
 
 	  se->registerSubsystem(clusterAna_EEMC);
 	}
