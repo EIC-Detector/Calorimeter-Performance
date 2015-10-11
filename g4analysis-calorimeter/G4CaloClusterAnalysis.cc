@@ -59,6 +59,41 @@ void G4CaloClusterAnalysis::SetStoreESum( int h_nbins , float h_xmin , float h_x
 }
 
 
+void G4CaloClusterAnalysis::SetStoreEMax( int h_nbins , float h_xmin , float h_xmax )
+{
+  /* Book histogram */
+  _h_emax = new TH1F( "h_emax" , "" , h_nbins, h_xmin, h_xmax );
+  _h_emax->GetXaxis()->SetTitle("E [GeV]");
+  _h_emax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
+}
+
+
+void G4CaloClusterAnalysis::SetStoreEtaMax( int h_nbins , float h_xmin , float h_xmax )
+{
+  /* Book histogram */
+  _h_etamax = new TH1F( "h_etamax" , "" , h_nbins, h_xmin, h_xmax );
+  _h_etamax->GetXaxis()->SetTitle("#eta");
+  _h_etamax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
+}
+
+
+void G4CaloClusterAnalysis::SetStorePhiMax( int h_nbins , float h_xmin , float h_xmax )
+{
+  /* Book histogram */
+  _h_phimax = new TH1F( "h_phimax" , "" , h_nbins, h_xmin, h_xmax );
+  _h_phimax->GetXaxis()->SetTitle("#phi");
+  _h_phimax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
+}
+
+
+void G4CaloClusterAnalysis::SetStoreDensityMax( int h_nbins , float h_xmin , float h_xmax )
+{
+  /* Book histogram */
+  _h_densitymax = new TH1F( "h_densitymax" , "" , h_nbins, h_xmin, h_xmax );
+  _h_densitymax->GetXaxis()->SetTitle("E / volume [density]");
+  _h_densitymax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
+}
+
 
 int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 {
@@ -86,7 +121,13 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
       return -1;//ABORTEVENT;
     }
 
-  /* Loop over all input nodes for cluster */
+  /* Variables to store information of cluster with maximum energy in event */
+  float e_max = 0;
+  float eta_max = 0;
+  float phi_max = 0;
+  float density_max = 0;
+
+  /* Loop over all input nodes for cluster and look for maximum energy cluster */
   for (unsigned i = 0; i < nnodes; i++)
     {
       CaloClusterContainer *_cluster = findNode::getClass<CaloClusterContainer>(topNode, _node_cluster_names.at(i).c_str());
@@ -107,6 +148,15 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 	      double energy = cluster_i->get_energy();
 
 	      event_esum += energy;
+
+	      /* check if this is maximum energy cluster */
+	      if ( energy > e_max )
+		{
+		  e_max = energy;
+		  eta_max = cluster_i->get_eta();;
+		  phi_max = cluster_i->get_phi();;
+		  density_max = energy / cluster_i->get_volume();
+		}
 
 	      /* Store single-cluster values */
 	      // ...
@@ -140,9 +190,20 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 
   /* Store full-event values */
   if ( _h_esum )
-    {
-      _h_esum->Fill( event_esum );
-    }
+    _h_esum->Fill( event_esum );
+
+  if ( _h_emax )
+    _h_emax->Fill( e_max );
+
+  if ( _h_etamax )
+    _h_etamax->Fill( eta_max );
+
+  if ( _h_phimax )
+    _h_phimax->Fill( phi_max );
+
+  if ( _h_emax )
+    _h_densitymax->Fill( density_max );
+
 
   return 0;
 }
@@ -156,6 +217,18 @@ int G4CaloClusterAnalysis::End(PHCompositeNode * topNode)
   /* Write histograms to output file */
   if ( _h_esum )
     _h_esum->Write();
+
+  if ( _h_emax )
+    _h_emax->Write();
+
+  if ( _h_etamax )
+    _h_etamax->Write();
+
+  if ( _h_phimax )
+    _h_phimax->Write();
+
+  if ( _h_densitymax )
+    _h_densitymax->Write();
 
   /* Write & Close output file */
   _outfile->Write();
