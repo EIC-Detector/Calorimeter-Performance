@@ -24,8 +24,8 @@ Fun4All_G4_Calorimeter_ZeroField(
   //======================
 
   bool do_EEMC = true;
-  bool do_FEMC = false;
-  bool do_FHCAL = false;
+  bool do_FEMC = true;
+  bool do_FHCAL = true;
 
   bool do_HitAnalysis = true;
   bool do_TowerAnalysis = true;
@@ -181,12 +181,18 @@ Fun4All_G4_Calorimeter_ZeroField(
 
   if ( do_FEMC )
     {
-      //...
+      CaloClusterBuilder* cluster_FEMC = new CaloClusterBuilder("FEMCClusterBuilder");
+      cluster_FEMC->Detector("FEMC");
+      cluster_FEMC->Verbosity(verbosity);
+      se->registerSubsystem(cluster_FEMC);
     }
 
   if ( do_FHCAL )
     {
-      //...
+      CaloClusterBuilder* cluster_FHCAL = new CaloClusterBuilder("FHCALClusterBuilder");
+      cluster_FHCAL->Detector("FHCAL");
+      cluster_FHCAL->Verbosity(verbosity);
+      se->registerSubsystem(cluster_FHCAL);
     }
 
 
@@ -295,12 +301,40 @@ Fun4All_G4_Calorimeter_ZeroField(
 
       if ( do_FEMC )
 	{
-	  //...
+	  	  ostringstream fname_cluster_femc;
+	  fname_cluster_femc.str("");
+	  fname_cluster_femc << "ClusterAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			     << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+	  G4CaloClusterAnalysis* clusterAna_FEMC = new G4CaloClusterAnalysis( "ClusterAna_FEMC" , fname_cluster_femc.str().c_str() );
+	  clusterAna_FEMC->AddClusterNode("CLUSTER_FEMC");
+
+	  clusterAna_FEMC->SetStoreESum( 10001 , -0.05 , 100.05 );
+	  clusterAna_FEMC->SetStoreEMax( 10001 , -0.05 , 100.05 );
+	  clusterAna_FEMC->SetStoreEtaMax( 101 , -5.05 , 5.05 );
+	  clusterAna_FEMC->SetStorePhiMax( 101 , -5.05 , 5.05 );
+	  clusterAna_FEMC->SetStoreDensityMax( 1001 , -0.000005 , 0.005005 );
+
+	  se->registerSubsystem(clusterAna_FEMC);
 	}
 
       if ( do_FHCAL )
 	{
-	  //...
+	  ostringstream fname_cluster_fhcal;
+	  fname_cluster_fhcal.str("");
+	  fname_cluster_fhcal << "ClusterAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			     << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+	  G4CaloClusterAnalysis* clusterAna_FHCAL = new G4CaloClusterAnalysis( "ClusterAna_FHCAL" , fname_cluster_fhcal.str().c_str() );
+	  clusterAna_FHCAL->AddClusterNode("CLUSTER_FHCAL");
+
+	  clusterAna_FHCAL->SetStoreESum( 10001 , -0.05 , 100.05 );
+	  clusterAna_FHCAL->SetStoreEMax( 10001 , -0.05 , 100.05 );
+	  clusterAna_FHCAL->SetStoreEtaMax( 101 , -5.05 , 5.05 );
+	  clusterAna_FHCAL->SetStorePhiMax( 101 , -5.05 , 5.05 );
+	  clusterAna_FHCAL->SetStoreDensityMax( 1001 , -0.000005 , 0.005005 );
+
+	  se->registerSubsystem(clusterAna_FHCAL);
 	}
     }
 
