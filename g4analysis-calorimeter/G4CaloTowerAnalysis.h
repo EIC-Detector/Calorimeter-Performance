@@ -22,7 +22,7 @@ class CaloTowerv1;
 class CaloTowerContainer;
 
 class TFile;
-class TH1F;
+class TNtuple;
 
 /** Analyze tower in calorimeter and store information in ROOT output file.
  *
@@ -56,14 +56,6 @@ class G4CaloTowerAnalysis : public SubsysReco
      loop through all of them for each event) */
   void AddTowerNode(const std::string &name) {_node_tower_names.push_back(name);}
 
-  /* Switch on and define parameters for histogram storing event-wise total deposited energy */
-  void SetStoreESum( bool onoff , int h_nbins , float h_xmin , float h_xmax ) {
-    _store_esum = onoff;
-    _h_esum_bins = h_nbins;
-    _h_esum_xmin = h_xmin;
-    _h_esum_xmax = h_xmax;
-  }
-
 protected:
 
   /* ROOT output file */
@@ -78,12 +70,7 @@ protected:
 
   int _nevent;
 
-  bool _store_esum;
-  TH1F* _h_esum;
-  int _h_esum_bins;
-  int _h_esum_xmin;
-  int _h_esum_xmax;
-
+  TNtuple* _t_tower;
 };
 
 #endif
