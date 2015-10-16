@@ -259,19 +259,31 @@ Fun4All_G4_Calorimeter_ZeroField(
 
 	  G4CaloTowerAnalysis* towerAna_EEMC = new G4CaloTowerAnalysis( "TowerAna_EEMC" , fname_tower_eemc.str().c_str() );
 	  towerAna_EEMC->AddTowerNode("TOWER_EEMC");
-	  towerAna_EEMC->SetStoreESum( true , 10001 , -0.05 , 100.05 );
-
 	  se->registerSubsystem(towerAna_EEMC);
 	}
 
       if ( do_FEMC )
 	{
-	  //...
+	  ostringstream fname_tower_femc;
+	  fname_tower_femc.str("");
+	  fname_tower_femc << "TowerAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_FEMC = new G4CaloTowerAnalysis( "TowerAna_FEMC" , fname_tower_femc.str().c_str() );
+	  towerAna_FEMC->AddTowerNode("TOWER_FEMC");
+	  se->registerSubsystem(towerAna_FEMC);
 	}
 
       if ( do_FHCAL )
 	{
-	  //...
+	  ostringstream fname_tower_fhcal;
+	  fname_tower_fhcal.str("");
+	  fname_tower_fhcal << "TowerAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_FHCAL = new G4CaloTowerAnalysis( "TowerAna_FHCAL" , fname_tower_fhcal.str().c_str() );
+	  towerAna_FHCAL->AddTowerNode("TOWER_FHCAL");
+	  se->registerSubsystem(towerAna_FHCAL);
 	}
     }
 
@@ -289,13 +301,6 @@ Fun4All_G4_Calorimeter_ZeroField(
 
 	  G4CaloClusterAnalysis* clusterAna_EEMC = new G4CaloClusterAnalysis( "ClusterAna_EEMC" , fname_cluster_eemc.str().c_str() );
 	  clusterAna_EEMC->AddClusterNode("CLUSTER_EEMC");
-
-	  clusterAna_EEMC->SetStoreESum( 10001 , -0.05 , 100.05 );
-	  clusterAna_EEMC->SetStoreEMax( 10001 , -0.05 , 100.05 );
-	  clusterAna_EEMC->SetStoreEtaMax( 101 , -5.05 , 5.05 );
-	  clusterAna_EEMC->SetStorePhiMax( 101 , -5.05 , 5.05 );
-	  clusterAna_EEMC->SetStoreDensityMax( 1001 , -0.000005 , 0.005005 );
-
 	  se->registerSubsystem(clusterAna_EEMC);
 	}
 
@@ -308,13 +313,6 @@ Fun4All_G4_Calorimeter_ZeroField(
 
 	  G4CaloClusterAnalysis* clusterAna_FEMC = new G4CaloClusterAnalysis( "ClusterAna_FEMC" , fname_cluster_femc.str().c_str() );
 	  clusterAna_FEMC->AddClusterNode("CLUSTER_FEMC");
-
-	  clusterAna_FEMC->SetStoreESum( 10001 , -0.05 , 100.05 );
-	  clusterAna_FEMC->SetStoreEMax( 10001 , -0.05 , 100.05 );
-	  clusterAna_FEMC->SetStoreEtaMax( 101 , -5.05 , 5.05 );
-	  clusterAna_FEMC->SetStorePhiMax( 101 , -5.05 , 5.05 );
-	  clusterAna_FEMC->SetStoreDensityMax( 1001 , -0.000005 , 0.005005 );
-
 	  se->registerSubsystem(clusterAna_FEMC);
 	}
 
@@ -327,13 +325,6 @@ Fun4All_G4_Calorimeter_ZeroField(
 
 	  G4CaloClusterAnalysis* clusterAna_FHCAL = new G4CaloClusterAnalysis( "ClusterAna_FHCAL" , fname_cluster_fhcal.str().c_str() );
 	  clusterAna_FHCAL->AddClusterNode("CLUSTER_FHCAL");
-
-	  clusterAna_FHCAL->SetStoreESum( 10001 , -0.05 , 100.05 );
-	  clusterAna_FHCAL->SetStoreEMax( 10001 , -0.05 , 100.05 );
-	  clusterAna_FHCAL->SetStoreEtaMax( 101 , -5.05 , 5.05 );
-	  clusterAna_FHCAL->SetStorePhiMax( 101 , -5.05 , 5.05 );
-	  clusterAna_FHCAL->SetStoreDensityMax( 1001 , -0.000005 , 0.005005 );
-
 	  se->registerSubsystem(clusterAna_FHCAL);
 	}
     }
