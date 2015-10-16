@@ -47,7 +47,7 @@ int G4CaloClusterAnalysis::Init( PHCompositeNode* topNode )
   _outfile = new TFile(_filename.c_str(), "RECREATE");
 
   _t_cluster = new TNtuple("t_cluster","cluster information",
-			   "event:ncluster:clusterID:eta:phi:e:volume:"
+			   "event:ncluster:e_total:clusterID:eta:phi:e:volume:"
 			   "density:ntowers:"
 			   "gparticleID:gflavor:"
 			   "geta:gphi:ge:gpt");
@@ -63,7 +63,7 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
   _nevent++;
 
   /* List of full event parameters */
-  float event_esum = 0;
+  float e_total = 0;
 
   /* Get the Geant4 Truth particle information container */
   _truth_info_container = findNode::getClass<PHG4TruthInfoContainer>(topNode,_node_name_truth.c_str());
@@ -137,7 +137,7 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 	      cluster_i= dynamic_cast<CaloClusterv1*>( (*clusterit).second );
 	      double energy = cluster_i->get_energy();
 
-	      event_esum += energy;
+	      e_total += energy;
 
 	      /* check if this is maximum energy cluster */
 	      if ( energy > e_max )
@@ -181,8 +181,9 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 
 
   /* Fill tree with information from this event */
-  float cluster_data[15] = {_nevent,
+  float cluster_data[16] = {_nevent,
 			    ncluster,
+			    e_total,
 			    clusterID_max,
 			    eta_max,
 			    phi_max,
