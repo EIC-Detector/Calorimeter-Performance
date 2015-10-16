@@ -22,7 +22,6 @@ class CaloClusterv1;
 class CaloClusterContainer;
 
 class TFile;
-class TH1F;
 class TNtuple;
 
 /** Analyze cluster in calorimeter and store information in ROOT output file.
@@ -57,20 +56,6 @@ class G4CaloClusterAnalysis : public SubsysReco
      loop through all of them for each event) */
   void AddClusterNode(const std::string &name) {_node_cluster_names.push_back(name);}
 
-  /* Switch on and define parameters for histogram storing event-wise total deposited energy */
-  void SetStoreESum( int h_nbins , float h_xmin , float h_xmax );
-
-  /* Switch on and define parameters for histogram storing energy of cluster with maximum deposited energy in each event */
-  void SetStoreEMax( int h_nbins , float h_xmin , float h_xmax );
-
-  /* Switch on and define parameters for histogram storing eta of cluster with maximum deposited energy in each event */
-  void SetStoreEtaMax( int h_nbins , float h_xmin , float h_xmax );
-
-  /* Switch on and define parameters for histogram storing phi of cluster with maximum deposited energy in each event */
-  void SetStorePhiMax( int h_nbins , float h_xmin , float h_xmax );
-
-  /* Switch on and define parameters for histogram storing energy density of cluster with maximum deposited energy in each event */
-  void SetStoreDensityMax( int h_nbins , float h_xmin , float h_xmax );
 
 protected:
 
@@ -87,12 +72,6 @@ protected:
   int _nevent;
 
   TNtuple* _t_cluster;
-
-  TH1F* _h_esum;
-  TH1F* _h_emax;
-  TH1F* _h_etamax;
-  TH1F* _h_phimax;
-  TH1F* _h_densitymax;
 
 };
 

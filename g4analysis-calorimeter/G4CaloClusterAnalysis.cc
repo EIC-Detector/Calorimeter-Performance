@@ -18,9 +18,8 @@
 #include <fun4all/getClass.h>
 
 /* ROOT includes */
-#include "TFile.h"
-#include "TH1F.h"
-#include "TMath.h"
+#include <TFile.h>
+#include <TMath.h>
 #include <TNtuple.h>
 
 using namespace std;
@@ -32,8 +31,7 @@ G4CaloClusterAnalysis::G4CaloClusterAnalysis(const std::string name , const std:
   _filename(filename),
   _node_name_truth("G4TruthInfo"),
   _nevent(0),
-  _t_cluster(NULL),
-  _h_esum(NULL)
+  _t_cluster(NULL)
 {
 
 }
@@ -55,51 +53,6 @@ int G4CaloClusterAnalysis::Init( PHCompositeNode* topNode )
 			   "geta:gphi:ge:gpt");
 
   return 0;
-}
-
-
-void G4CaloClusterAnalysis::SetStoreESum( int h_nbins , float h_xmin , float h_xmax )
-{
-  /* Book histogram */
-  _h_esum = new TH1F( "h_esum" , "" , h_nbins, h_xmin, h_xmax );
-  _h_esum->GetXaxis()->SetTitle("E [GeV]");
-  _h_esum->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
-}
-
-
-void G4CaloClusterAnalysis::SetStoreEMax( int h_nbins , float h_xmin , float h_xmax )
-{
-  /* Book histogram */
-  _h_emax = new TH1F( "h_emax" , "" , h_nbins, h_xmin, h_xmax );
-  _h_emax->GetXaxis()->SetTitle("E [GeV]");
-  _h_emax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
-}
-
-
-void G4CaloClusterAnalysis::SetStoreEtaMax( int h_nbins , float h_xmin , float h_xmax )
-{
-  /* Book histogram */
-  _h_etamax = new TH1F( "h_etamax" , "" , h_nbins, h_xmin, h_xmax );
-  _h_etamax->GetXaxis()->SetTitle("#eta");
-  _h_etamax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
-}
-
-
-void G4CaloClusterAnalysis::SetStorePhiMax( int h_nbins , float h_xmin , float h_xmax )
-{
-  /* Book histogram */
-  _h_phimax = new TH1F( "h_phimax" , "" , h_nbins, h_xmin, h_xmax );
-  _h_phimax->GetXaxis()->SetTitle("#phi");
-  _h_phimax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
-}
-
-
-void G4CaloClusterAnalysis::SetStoreDensityMax( int h_nbins , float h_xmin , float h_xmax )
-{
-  /* Book histogram */
-  _h_densitymax = new TH1F( "h_densitymax" , "" , h_nbins, h_xmin, h_xmax );
-  _h_densitymax->GetXaxis()->SetTitle("E / volume [density]");
-  _h_densitymax->GetYaxis()->SetTitle("# Entries / #Sigma Entries");
 }
 
 
@@ -226,21 +179,6 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 	}
     }
 
-  /* Store full-event values */
-  if ( _h_esum )
-    _h_esum->Fill( event_esum );
-
-  if ( _h_emax )
-    _h_emax->Fill( e_max );
-
-  if ( _h_etamax )
-    _h_etamax->Fill( eta_max );
-
-  if ( _h_phimax )
-    _h_phimax->Fill( phi_max );
-
-  if ( _h_emax )
-    _h_densitymax->Fill( density_max );
 
   /* Fill tree with information from this event */
   float cluster_data[15] = {_nevent,
@@ -271,21 +209,8 @@ int G4CaloClusterAnalysis::End(PHCompositeNode * topNode)
   /* Select output file */
   _outfile->cd();
 
-  /* Write histograms to output file */
-  if ( _h_esum )
-    _h_esum->Write();
-
-  if ( _h_emax )
-    _h_emax->Write();
-
-  if ( _h_etamax )
-    _h_etamax->Write();
-
-  if ( _h_phimax )
-    _h_phimax->Write();
-
-  if ( _h_densitymax )
-    _h_densitymax->Write();
+  /* Write Tree to output file */
+  _t_cluster->Write();
 
   /* Write & Close output file */
   _outfile->Write();
