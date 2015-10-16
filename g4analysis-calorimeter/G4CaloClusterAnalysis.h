@@ -23,6 +23,7 @@ class CaloClusterContainer;
 
 class TFile;
 class TH1F;
+class TNtuple;
 
 /** Analyze cluster in calorimeter and store information in ROOT output file.
  *
@@ -84,6 +85,8 @@ protected:
   std::vector< std::string > _node_cluster_names;
 
   int _nevent;
+
+  TNtuple* _t_cluster;
 
   TH1F* _h_esum;
   TH1F* _h_emax;

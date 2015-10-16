@@ -21,6 +21,7 @@
 #include "TFile.h"
 #include "TH1F.h"
 #include "TMath.h"
+#include <TNtuple.h>
 
 using namespace std;
 
@@ -31,6 +32,7 @@ G4CaloClusterAnalysis::G4CaloClusterAnalysis(const std::string name , const std:
   _filename(filename),
   _node_name_truth("G4TruthInfo"),
   _nevent(0),
+  _t_cluster(NULL),
   _h_esum(NULL)
 {
 
@@ -45,6 +47,12 @@ int G4CaloClusterAnalysis::Init( PHCompositeNode* topNode )
 
   /* Create new output file */
   _outfile = new TFile(_filename.c_str(), "RECREATE");
+
+  _t_cluster = new TNtuple("t_cluster","cluster information",
+			   "event:ncluster:clusterID:eta:phi:e:volume:"
+			   "density:ntowers:"
+			   "gparticleID:gflavor:"
+			   "geta:gphi:ge:gpt");
 
   return 0;
 }
@@ -112,6 +120,28 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
       return -1;//ABORTEVENT;
     }
 
+  /* Get truth info */
+  PHG4TruthInfoContainer::Map map = _truth_info_container->GetPrimaryMap();
+  //  for (PHG4TruthInfoContainer::ConstIterator iter = map.begin(); iter != map.end();  ++iter)
+  //    {
+
+  // select first primary particle in map- assume single-particle event (particle gun)
+  PHG4Particle* primary = map.begin()->second;
+
+  float gpid = primary->get_track_id();
+  float gflavor = primary->get_pid();
+
+  float gpx = primary->get_px();
+  float gpy = primary->get_py();
+  float gpz = primary->get_pz();
+  float ge = primary->get_e();
+
+  float gpt = sqrt(gpx*gpx+gpy*gpy);
+  float geta = NAN;
+  if (gpt != 0.0) geta = asinh(gpz/gpt);
+  float gphi = atan2(gpy,gpx);
+  //}
+
   /* Get Cluster from input nodes */
   unsigned nnodes = _node_cluster_names.size();
 
@@ -125,7 +155,12 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
   float e_max = 0;
   float eta_max = 0;
   float phi_max = 0;
+  float volume_max = 0;
   float density_max = 0;
+  float clusterID_max = 0;
+  float ntowers_max = 0;
+
+  float ncluster = 0;
 
   /* Loop over all input nodes for cluster and look for maximum energy cluster */
   for (unsigned i = 0; i < nnodes; i++)
@@ -143,6 +178,8 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 
 	  for (clusterit = clusters_begin_end.first; clusterit != clusters_begin_end.second; clusterit++)
 	    {
+	      ncluster++;
+
 	      /* Get raw cluster and energy */
 	      cluster_i= dynamic_cast<CaloClusterv1*>( (*clusterit).second );
 	      double energy = cluster_i->get_energy();
@@ -153,13 +190,14 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 	      if ( energy > e_max )
 		{
 		  e_max = energy;
-		  eta_max = cluster_i->get_eta();;
-		  phi_max = cluster_i->get_phi();;
-		  density_max = energy / cluster_i->get_volume();
+		  eta_max = cluster_i->get_eta();
+		  phi_max = cluster_i->get_phi();
+		  volume_max = cluster_i->get_volume();
+		  density_max = e_max / volume_max;
+		  clusterID_max = cluster_i->get_id();
+		  ntowers_max = cluster_i->getNTowers();
 		}
 
-	      /* Store single-cluster values */
-	      // ...
 
 	      /* Print cluster and neighbor information */
 	      if ( _nevent == 1 )
@@ -204,6 +242,25 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
   if ( _h_emax )
     _h_densitymax->Fill( density_max );
 
+  /* Fill tree with information from this event */
+  float cluster_data[15] = {_nevent,
+			    ncluster,
+			    clusterID_max,
+			    eta_max,
+			    phi_max,
+			    e_max,
+			    volume_max,
+			    density_max,
+			    ntowers_max,
+			    gpid,
+			    gflavor,
+			    geta,
+			    gphi,
+			    ge,
+			    gpt
+  };
+
+  _t_cluster->Fill(cluster_data);
 
   return 0;
 }
