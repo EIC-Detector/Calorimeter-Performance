@@ -47,7 +47,7 @@ int G4CaloClusterAnalysis::Init( PHCompositeNode* topNode )
   _outfile = new TFile(_filename.c_str(), "RECREATE");
 
   _t_cluster = new TNtuple("t_cluster","cluster information",
-			   "event:ncluster:e_total:clusterID:eta:phi:e:volume:"
+			   "event:clusterID:eta:phi:e:volume:"
 			   "density:ntowers:"
 			   "gparticleID:gflavor:"
 			   "geta:gphi:ge:gpt");
@@ -61,9 +61,6 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 
   /* Increment event counter */
   _nevent++;
-
-  /* List of full event parameters */
-  float e_total = 0;
 
   /* Get the Geant4 Truth particle information container */
   _truth_info_container = findNode::getClass<PHG4TruthInfoContainer>(topNode,_node_name_truth.c_str());
@@ -104,18 +101,7 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
       return -1;//ABORTEVENT;
     }
 
-  /* Variables to store information of cluster with maximum energy in event */
-  float e_max = 0;
-  float eta_max = 0;
-  float phi_max = 0;
-  float volume_max = 0;
-  float density_max = 0;
-  float clusterID_max = 0;
-  float ntowers_max = 0;
-
-  float ncluster = 0;
-
-  /* Loop over all input nodes for cluster and look for maximum energy cluster */
+  /* Loop over all input nodes for cluster */
   for (unsigned i = 0; i < nnodes; i++)
     {
       CaloClusterContainer *_cluster = findNode::getClass<CaloClusterContainer>(topNode, _node_cluster_names.at(i).c_str());
@@ -131,75 +117,70 @@ int G4CaloClusterAnalysis::process_event( PHCompositeNode* topNode )
 
 	  for (clusterit = clusters_begin_end.first; clusterit != clusters_begin_end.second; clusterit++)
 	    {
-	      ncluster++;
+
+	      /* Variables to store information of cluster */
+	      float clusterID = 0;
+	      float ntowers = 0;
+	      float e = 0;
+	      float eta = 0;
+	      float phi = 0;
+	      float volume = 0;
+	      float density = 0;
 
 	      /* Get raw cluster and energy */
 	      cluster_i= dynamic_cast<CaloClusterv1*>( (*clusterit).second );
-	      double energy = cluster_i->get_energy();
 
-	      e_total += energy;
-
-	      /* check if this is maximum energy cluster */
-	      if ( energy > e_max )
-		{
-		  e_max = energy;
-		  eta_max = cluster_i->get_eta();
-		  phi_max = cluster_i->get_phi();
-		  volume_max = cluster_i->get_volume();
-		  density_max = e_max / volume_max;
-		  clusterID_max = cluster_i->get_id();
-		  ntowers_max = cluster_i->getNTowers();
-		}
+	      e = cluster_i->get_energy();
+	      eta = cluster_i->get_eta();
+	      phi = cluster_i->get_phi();
+	      volume = cluster_i->get_volume();
+	      density = e / volume;
+	      clusterID = cluster_i->get_id();
+	      ntowers = cluster_i->getNTowers();
 
 
 	      /* Print cluster and neighbor information */
-	      if ( _nevent == 1 )
-		{
-		  unsigned int clusterid = cluster_i->get_id();
-		  cout << "*** Event #" << _nevent << " Cluster (" << clusterid << ") : Energy "
-		       << cluster_i->get_energy() <<  ", Volume " << cluster_i->get_volume() << " , #Towers: " << cluster_i->getNTowers() << endl;
+	      //if ( _nevent == 1 )
+	      //	{
+	      //	  cout << "*** Event #" << _nevent << " Cluster (" << clusterID << ") : Energy "
+	      //	       << cluster_i->get_energy() <<  ", Volume " << cluster_i->get_volume() << " , #Towers: " << cluster_i->getNTowers() << endl;
+	      //
+	      //	  cout << "** Eta = " << cluster_i->get_eta() << " ,  Phi = " << cluster_i->get_phi() << endl;
+	      //
+	      //	  cout << "** x,y,z = " << cluster_i->get_x() << " , " << cluster_i->get_y() << " , " << cluster_i->get_z() << endl;
+	      //
+	      //	  CaloCluster::TowerConstRange begin_end = cluster_i->get_towers();
+	      //	  CaloCluster::TowerConstIterator iter;
+	      //
+	      //	  cout << "** Towers(Energy) included: \n";
+	      //	  for (iter = begin_end.first; iter != begin_end.second; ++iter)
+	      //	    {
+	      //	      cout << (iter->first) << "(" << (iter->second) << ") \n";
+	      //	    }
+	      //	  cout << endl;
 
-		  cout << "** Eta = " << cluster_i->get_eta() << " ,  Phi = " << cluster_i->get_phi() << endl;
+	      /* Fill tree with information from this event */
+	      float cluster_data[14] = {_nevent,
+					clusterID,
+					eta,
+					phi,
+					e,
+					volume,
+					density,
+					ntowers,
+					gpid,
+					gflavor,
+					geta,
+					gphi,
+					ge,
+					gpt
+	      };
 
-		  cout << "** x,y,z = " << cluster_i->get_x() << " , " << cluster_i->get_y() << " , " << cluster_i->get_z() << endl;
+	      _t_cluster->Fill(cluster_data);
 
-		  CaloCluster::TowerConstRange begin_end = cluster_i->get_towers();
-		  CaloCluster::TowerConstIterator iter;
-
-		  cout << "** Towers(Energy) included: \n";
-		  for (iter = begin_end.first; iter != begin_end.second; ++iter)
-		    {
-		      cout << (iter->first) << "(" << (iter->second) << ") \n";
-		    }
-		  cout << endl;
-
-
-		}
 	    }
 	}
     }
-
-
-  /* Fill tree with information from this event */
-  float cluster_data[16] = {_nevent,
-			    ncluster,
-			    e_total,
-			    clusterID_max,
-			    eta_max,
-			    phi_max,
-			    e_max,
-			    volume_max,
-			    density_max,
-			    ntowers_max,
-			    gpid,
-			    gflavor,
-			    geta,
-			    gphi,
-			    ge,
-			    gpt
-  };
-
-  _t_cluster->Fill(cluster_data);
 
   return 0;
 }
