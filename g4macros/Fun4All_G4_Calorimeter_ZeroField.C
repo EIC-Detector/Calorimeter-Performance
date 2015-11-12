@@ -29,6 +29,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 
   bool do_HitAnalysis = true;
   bool do_TowerAnalysis = true;
+  bool do_DigiTowerAnalysis = true;
   bool do_ClusterAnalysis = true;
 
   //---------------
@@ -153,9 +154,20 @@ Fun4All_G4_Calorimeter_ZeroField(
   //----------------------
   if ( do_EEMC )
     {
-      //      CrystalCalorimeterDigitization* digi_EEMC = new CrystalCalorimeterDigitization("CrystalCalorimeterDigitization","TOWER_EEMC","TDIGI_EEMC");
+      const double EEMC_photoelectron_per_GeV = 500;//500 photon per total GeV deposition
 
-      //      se->registerSubsystem(digi_EEMC);
+      CaloTowerDigitizer *TowerDigitizer_EEMC = new CaloTowerDigitizer("EEmcCaloTowerDigitizer");
+      TowerDigitizer_EEMC->Detector("EEMC");
+      TowerDigitizer_EEMC->Verbosity(verbosity);
+      TowerDigitizer_EEMC->set_sim_tower_node_prefix("");
+      TowerDigitizer_EEMC->set_calo_tower_node_prefix("DIGI");
+      TowerDigitizer_EEMC->set_digi_algorithm(CaloTowerDigitizer::kSimple_photon_digitalization);
+      TowerDigitizer_EEMC->set_pedstal_central_ADC(0);
+      TowerDigitizer_EEMC->set_pedstal_width_ADC(8);// eRD1 test beam setting
+      TowerDigitizer_EEMC->set_photonelec_ADC(1);//not simulating ADC discretization error
+      TowerDigitizer_EEMC->set_photonelec_yield_visible_GeV( EEMC_photoelectron_per_GeV );
+      TowerDigitizer_EEMC->set_zero_suppression_ADC(16); // eRD1 test beam setting
+      se->registerSubsystem( TowerDigitizer_EEMC );
     }
   if ( do_FEMC )
     {
@@ -286,6 +298,26 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  se->registerSubsystem(towerAna_FHCAL);
 	}
     }
+
+
+  //----------------------
+  // Digitized Tower analysis for Calorimeter
+  //----------------------
+  if ( do_DigiTowerAnalysis )
+    {
+      if ( do_EEMC )
+	{
+	  ostringstream fname_digi_tower_eemc;
+	  fname_digi_tower_eemc.str("");
+	  fname_digi_tower_eemc << "DigiTowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+				<< "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* digiTowerAna_EEMC = new G4CaloTowerAnalysis( "DigiTowerAna_EEMC" , fname_digi_tower_eemc.str().c_str() );
+	  digiTowerAna_EEMC->AddTowerNode("TOWER_DIGI_EEMC");
+	  se->registerSubsystem(digiTowerAna_EEMC);
+	}
+    }
+
 
   //----------------------
   // Cluster analysis for Calorimeter
