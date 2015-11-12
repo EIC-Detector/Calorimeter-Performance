@@ -6,7 +6,9 @@ Fun4All_G4_Calorimeter_ZeroField(
 				 float ppmin = 10,
 				 float ppmax = 10,
 				 float petamin = -2,
-				 float petamax = -2
+				 float petamax = -2,
+				 float phimin = (TMath::Pi() / 4),
+				 float phimax = (TMath::Pi() / 4)
 				 )
 {
 
@@ -17,6 +19,8 @@ Fun4All_G4_Calorimeter_ZeroField(
   cout << "... momentum (max) = " << ppmax << endl;
   cout << "... eta (min) = " << petamin << endl;
   cout << "... eta (max) = " << petamax << endl;
+  cout << "... phi (min) = " << phimin << endl;
+  cout << "... phi (max) = " << phimax << endl;
 
 
   //======================
@@ -89,8 +93,8 @@ Fun4All_G4_Calorimeter_ZeroField(
   gen->set_name(ptype); // e,pi,mu,p,gamma
   gen->set_vtx(0, 0, 0);
   gen->set_z_range(0, 0);
-  gen->set_eta_range(petamin, petamax);
-  gen->set_phi_range(TMath::Pi() / 4, TMath::Pi() / 4 );
+  gen->set_eta_range( petamin, petamax );
+  gen->set_phi_range( phimin, phimax );
   //gen->set_phi_range( 0 , 2 * TMath::Pi() );
   gen->set_mom_range(ppmin, ppmax); // 1 10 20 50
   // gen->Verbosity(1);
@@ -218,7 +222,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_hit_eemc;
 	  fname_hit_eemc.str("");
 	  fname_hit_eemc << "G4Hit_Eemc_Default" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			 << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			 << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloShowerAnalysis* hitAna_EEMC = new G4CaloShowerAnalysis( "G4Hit_Eemc" , fname_hit_eemc.str().c_str() );
 	  hitAna_EEMC->AddG4HitNode("G4HIT_EEMC");
@@ -267,7 +271,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_tower_eemc;
 	  fname_tower_eemc.str("");
 	  fname_tower_eemc << "TowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			   << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloTowerAnalysis* towerAna_EEMC = new G4CaloTowerAnalysis( "TowerAna_EEMC" , fname_tower_eemc.str().c_str() );
 	  towerAna_EEMC->AddTowerNode("TOWER_EEMC");
@@ -279,7 +283,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_tower_femc;
 	  fname_tower_femc.str("");
 	  fname_tower_femc << "TowerAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			   << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloTowerAnalysis* towerAna_FEMC = new G4CaloTowerAnalysis( "TowerAna_FEMC" , fname_tower_femc.str().c_str() );
 	  towerAna_FEMC->AddTowerNode("TOWER_FEMC");
@@ -291,7 +295,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_tower_fhcal;
 	  fname_tower_fhcal.str("");
 	  fname_tower_fhcal << "TowerAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			   << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloTowerAnalysis* towerAna_FHCAL = new G4CaloTowerAnalysis( "TowerAna_FHCAL" , fname_tower_fhcal.str().c_str() );
 	  towerAna_FHCAL->AddTowerNode("TOWER_FHCAL");
@@ -310,7 +314,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_digi_tower_eemc;
 	  fname_digi_tower_eemc.str("");
 	  fname_digi_tower_eemc << "DigiTowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-				<< "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+				<< "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloTowerAnalysis* digiTowerAna_EEMC = new G4CaloTowerAnalysis( "DigiTowerAna_EEMC" , fname_digi_tower_eemc.str().c_str() );
 	  digiTowerAna_EEMC->AddTowerNode("TOWER_DIGI_EEMC");
@@ -329,7 +333,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_cluster_eemc;
 	  fname_cluster_eemc.str("");
 	  fname_cluster_eemc << "ClusterAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			     << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloClusterAnalysis* clusterAna_EEMC = new G4CaloClusterAnalysis( "ClusterAna_EEMC" , fname_cluster_eemc.str().c_str() );
 	  clusterAna_EEMC->AddClusterNode("CLUSTER_EEMC");
@@ -341,7 +345,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  	  ostringstream fname_cluster_femc;
 	  fname_cluster_femc.str("");
 	  fname_cluster_femc << "ClusterAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			     << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloClusterAnalysis* clusterAna_FEMC = new G4CaloClusterAnalysis( "ClusterAna_FEMC" , fname_cluster_femc.str().c_str() );
 	  clusterAna_FEMC->AddClusterNode("CLUSTER_FEMC");
@@ -353,7 +357,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  ostringstream fname_cluster_fhcal;
 	  fname_cluster_fhcal.str("");
 	  fname_cluster_fhcal << "ClusterAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			     << "_eta_" << petamin << "_" << petamax << "_" << nEvents << ".root" ;
+			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
 	  G4CaloClusterAnalysis* clusterAna_FHCAL = new G4CaloClusterAnalysis( "ClusterAna_FHCAL" , fname_cluster_fhcal.str().c_str() );
 	  clusterAna_FHCAL->AddClusterNode("CLUSTER_FHCAL");
