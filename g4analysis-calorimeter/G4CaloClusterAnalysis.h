@@ -1,9 +1,9 @@
-#ifndef _G4_CALO_TOWER_ANALYSIS_H_
-#define _G4_CALO_TOWER_ANALYSIS_H_
+#ifndef _G4_CALO_CLUSTER_ANALYSIS_H_
+#define _G4_CALO_CLUSTER_ANALYSIS_H_
 
 /*g4cemc includes */
-#include <g4cemc/CaloTowerv1.h>
-#include <g4cemc/CaloTowerContainer.h>
+#include <g4cemc/CaloClusterv1.h>
+#include <g4cemc/CaloClusterContainer.h>
 
 /* STL includes */
 #include <string>
@@ -17,28 +17,28 @@ class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class Fun4AllHistoManager;
 
-class CaloTower;
-class CaloTowerv1;
-class CaloTowerContainer;
+class CaloCluster;
+class CaloClusterv1;
+class CaloClusterContainer;
 
 class TFile;
 class TNtuple;
 
-/** Analyze tower in calorimeter and store information in ROOT output file.
+/** Analyze cluster in calorimeter and store information in ROOT output file.
  *
  * \author Nils Feege <nils.feege@stonybrook.edu>
  * \version $$Revision: 1.1 $$
  * \date $$Date: 2015/03/19 23:31:21 $$
  */
-class G4CaloTowerAnalysis : public SubsysReco
+class G4CaloClusterAnalysis : public SubsysReco
 {
  public:
 
   /* Default constructor */
-  G4CaloTowerAnalysis( const std::string name = "G4CaloTowerAnalysis", const std::string filename = "G4CaloTowerAnalysis.root" );
+  G4CaloClusterAnalysis( const std::string name = "G4CaloClusterAnalysis", const std::string filename = "G4CaloClusterAnalysis.root" );
 
   /* Default destructor */
-  virtual ~G4CaloTowerAnalysis();
+  virtual ~G4CaloClusterAnalysis();
 
   /* Full initialization method (called before first event)*/
   int Init(PHCompositeNode *);
@@ -52,9 +52,10 @@ class G4CaloTowerAnalysis : public SubsysReco
   /* Set name for node with True particle information */
   void AddTrueParticleNode(const std::string &name) {_node_name_truth = name;}
 
-  /* Add node name for another tower node (adding multiple nodes will make code
+  /* Add node name for another cluster node (adding multiple nodes will make code
      loop through all of them for each event) */
-  void AddTowerNode(const std::string &name) {_node_tower_names.push_back(name);}
+  void AddClusterNode(const std::string &name) {_node_cluster_names.push_back(name);}
+
 
 protected:
 
@@ -62,15 +63,16 @@ protected:
   TFile *_outfile;
 
   PHG4TruthInfoContainer *_truth_info_container;
-  CaloTowerContainer *_tower;
+  CaloClusterContainer *_cluster;
 
   std::string _filename;
   std::string _node_name_truth;
-  std::vector< std::string > _node_tower_names;
+  std::vector< std::string > _node_cluster_names;
 
   int _nevent;
 
-  TNtuple* _t_tower;
+  TNtuple* _t_cluster;
+
 };
 
 #endif
