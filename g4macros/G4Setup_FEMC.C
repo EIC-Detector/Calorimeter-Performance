@@ -48,9 +48,6 @@ FEMCSetup(PHG4Reco* g4Reco, const int absorberactive = 0)
   //FEcalInit();
   //G4_FEcal(g4Reco, 350.0, 1.1, 5.0, 100.);
 
-  CaloTowerGeomManager* geoman = CaloTowerGeomManager::instance();
-  geoman->ReadGeometryFromTable( "FEMC" , mapping_femc.str() );
-
   /**
    * 'spy' tracking layer infront of calorimeter to capture particle positions right before they
    * enter the caorimeter

@@ -27,14 +27,14 @@ Fun4All_G4_Calorimeter_ZeroField(
   // What to run
   //======================
 
-  bool do_EEMC = true;
-  bool do_FEMC = true;
+  bool do_EEMC = false;
+  bool do_FEMC = false;
   bool do_FHCAL = true;
 
-  bool do_HitAnalysis = true;
-  bool do_TowerAnalysis = true;
-  bool do_DigiTowerAnalysis = true;
-  bool do_ClusterAnalysis = true;
+  bool do_HitAnalysis = false;
+  bool do_TowerAnalysis = false;
+  bool do_DigiTowerAnalysis = false;
+  bool do_ClusterAnalysis = false;
 
   //---------------
   // Load libraries
@@ -48,7 +48,7 @@ Fun4All_G4_Calorimeter_ZeroField(
   gSystem->Load("libfun4all.so"); // core library
   gSystem->Load("libg4detectors.so"); // detector modules
   gSystem->Load("libcemc.so"); // tower, digitization etc for calorimeter
-  gSystem->Load("libg4ana_calo.so"); // calorimeter analysis
+  //  gSystem->Load("libg4ana_calo.so"); // calorimeter analysis
 
   /* Choose detector configuration */
   if ( do_EEMC )
@@ -130,24 +130,40 @@ Fun4All_G4_Calorimeter_ZeroField(
   //----------------------
   if ( do_EEMC )
     {
-      CaloTowerBuilderByHitIndex* tower_EEMC = new CaloTowerBuilderByHitIndex();
+      ostringstream mapping_eemc;
+      mapping_eecal << getenv("OFFLINE_MAIN") <<
+	"/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v002.txt";
+
+
+      RawTowerBuilderByHitIndex* tower_EEMC = new RawTowerBuilderByHitIndex("TowerBuilder_EEMC");
       tower_EEMC->Detector("EEMC");
+      tower_EEMC->GeometryTableFile( mapping_eemc.str() );
 
       se->registerSubsystem(tower_EEMC);
     }
 
   if ( do_FEMC )
     {
-      CaloTowerBuilderByHitIndex* tower_FEMC = new CaloTowerBuilderByHitIndex();
+      ostringstream mapping_femc;
+      mapping_femc << getenv("OFFLINE_MAIN") <<
+	"/share/calibrations/ForwardEcal/mapping/towerMap_FEMC_v002.txt";
+
+      RawTowerBuilderByHitIndex* tower_FEMC = new RawTowerBuilderByHitIndex("TowerBuilder_FEMC");
       tower_FEMC->Detector("FEMC");
+      tower_FEMC->GeometryTableFile( mapping_femc.str() );
 
       se->registerSubsystem(tower_FEMC);
     }
 
   if ( do_FHCAL )
     {
-      CaloTowerBuilderByHitIndex* tower_FHCAL = new CaloTowerBuilderByHitIndex();
+      ostringstream mapping_fhcal;
+      mapping_fhcal << getenv("OFFLINE_MAIN") <<
+	"/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v002.txt";
+
+      RawTowerBuilderByHitIndex* tower_FHCAL = new RawTowerBuilderByHitIndex("TowerBuilder_FHCAL");
       tower_FHCAL->Detector("FHCAL");
+      tower_FHCAL->GeometryTableFile( mapping_fhcal.str() );
 
       se->registerSubsystem(tower_FHCAL);
     }
@@ -156,93 +172,93 @@ Fun4All_G4_Calorimeter_ZeroField(
   //----------------------
   // Calorimeter Tower Digitization
   //----------------------
-  if ( do_EEMC )
-    {
-      const double EEMC_photoelectron_per_GeV = 500;//500 photon per total GeV deposition
-
-      CaloTowerDigitizer *TowerDigitizer_EEMC = new CaloTowerDigitizer("EEmcCaloTowerDigitizer");
-      TowerDigitizer_EEMC->Detector("EEMC");
-      TowerDigitizer_EEMC->Verbosity(verbosity);
-      TowerDigitizer_EEMC->set_sim_tower_node_prefix("");
-      TowerDigitizer_EEMC->set_calo_tower_node_prefix("DIGI");
-      TowerDigitizer_EEMC->set_digi_algorithm(CaloTowerDigitizer::kSimple_photon_digitalization);
-      TowerDigitizer_EEMC->set_pedstal_central_ADC(0);
-      TowerDigitizer_EEMC->set_pedstal_width_ADC(8);// eRD1 test beam setting
-      TowerDigitizer_EEMC->set_photonelec_ADC(1);//not simulating ADC discretization error
-      TowerDigitizer_EEMC->set_photonelec_yield_visible_GeV( EEMC_photoelectron_per_GeV );
-      TowerDigitizer_EEMC->set_zero_suppression_ADC(16); // eRD1 test beam setting
-      se->registerSubsystem( TowerDigitizer_EEMC );
-    }
-  if ( do_FEMC )
-    {
-      //...
-    }
-
-  if ( do_FHCAL )
-    {
-      //...
-    }
+//  if ( do_EEMC )
+//    {
+//      const double EEMC_photoelectron_per_GeV = 500;//500 photon per total GeV deposition
+//
+//      RawTowerDigitizer *TowerDigitizer_EEMC = new RawTowerDigitizer("EEmcRawTowerDigitizer");
+//      TowerDigitizer_EEMC->Detector("EEMC");
+//      TowerDigitizer_EEMC->Verbosity(verbosity);
+//      TowerDigitizer_EEMC->set_sim_tower_node_prefix("");
+//      TowerDigitizer_EEMC->set_calo_tower_node_prefix("DIGI");
+//      TowerDigitizer_EEMC->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitalization);
+//      TowerDigitizer_EEMC->set_pedstal_central_ADC(0);
+//      TowerDigitizer_EEMC->set_pedstal_width_ADC(8);// eRD1 test beam setting
+//      TowerDigitizer_EEMC->set_photonelec_ADC(1);//not simulating ADC discretization error
+//      TowerDigitizer_EEMC->set_photonelec_yield_visible_GeV( EEMC_photoelectron_per_GeV );
+//      TowerDigitizer_EEMC->set_zero_suppression_ADC(16); // eRD1 test beam setting
+//      se->registerSubsystem( TowerDigitizer_EEMC );
+//    }
+//  if ( do_FEMC )
+//    {
+//      //...
+//    }
+//
+//  if ( do_FHCAL )
+//    {
+//      //...
+//    }
 
 
   //----------------------
   // Build Calorimeter Cluster
   //----------------------
-  if ( do_EEMC )
-    {
-      CaloClusterBuilder* cluster_EEMC = new CaloClusterBuilder("EEMCClusterBuilder");
-      cluster_EEMC->Detector("EEMC");
-      cluster_EEMC->Verbosity(verbosity);
-      se->registerSubsystem(cluster_EEMC);
-    }
-
-  if ( do_FEMC )
-    {
-      CaloClusterBuilder* cluster_FEMC = new CaloClusterBuilder("FEMCClusterBuilder");
-      cluster_FEMC->Detector("FEMC");
-      cluster_FEMC->Verbosity(verbosity);
-      se->registerSubsystem(cluster_FEMC);
-    }
-
-  if ( do_FHCAL )
-    {
-      CaloClusterBuilder* cluster_FHCAL = new CaloClusterBuilder("FHCALClusterBuilder");
-      cluster_FHCAL->Detector("FHCAL");
-      cluster_FHCAL->Verbosity(verbosity);
-      se->registerSubsystem(cluster_FHCAL);
-    }
+//  if ( do_EEMC )
+//    {
+//      RawClusterBuilder* cluster_EEMC = new RawClusterBuilder("EEMCClusterBuilder");
+//      cluster_EEMC->Detector("EEMC");
+//      cluster_EEMC->Verbosity(verbosity);
+//      se->registerSubsystem(cluster_EEMC);
+//    }
+//
+//  if ( do_FEMC )
+//    {
+//      RawClusterBuilder* cluster_FEMC = new RawClusterBuilder("FEMCClusterBuilder");
+//      cluster_FEMC->Detector("FEMC");
+//      cluster_FEMC->Verbosity(verbosity);
+//      se->registerSubsystem(cluster_FEMC);
+//    }
+//
+//  if ( do_FHCAL )
+//    {
+//      RawClusterBuilder* cluster_FHCAL = new RawClusterBuilder("FHCALClusterBuilder");
+//      cluster_FHCAL->Detector("FHCAL");
+//      cluster_FHCAL->Verbosity(verbosity);
+//      se->registerSubsystem(cluster_FHCAL);
+//    }
 
 
   //----------------------
   // G4Hit analysis for Calorimeter
   //----------------------
-  if ( do_HitAnalysis )
-    {
-      if ( do_EEMC )
-	{
-	  ostringstream fname_hit_eemc;
-	  fname_hit_eemc.str("");
-	  fname_hit_eemc << "G4Hit_Eemc_Default" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			 << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloShowerAnalysis* hitAna_EEMC = new G4CaloShowerAnalysis( "G4Hit_Eemc" , fname_hit_eemc.str().c_str() );
-	  hitAna_EEMC->AddG4HitNode("G4HIT_EEMC");
-	  hitAna_EEMC->SetStoreESum( true , 4001 , -0.005 , 40.005 );
-	  hitAna_EEMC->SetComparison( true , "G4HIT_ENVELOPE_ENVELOPE" );
-	  hitAna_EEMC->SetComparisonSum( true , "G4HIT_ABSORBER_EEMC" );
-
-	  se->registerSubsystem(hitAna_EEMC);
-	}
-
-      if ( do_FEMC )
-	{
-	  //...
-	}
-
-      if ( do_FHCAL )
-	{
-	  //...
-	}
-    }
+//  if ( do_HitAnalysis )
+//    {
+//      if ( do_EEMC )
+//	{
+//	  ostringstream fname_hit_eemc;
+//	  fname_hit_eemc.str("");
+//	  fname_hit_eemc << "G4Hit_Eemc_Default" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			 << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4CaloShowerAnalysis* hitAna_EEMC = new G4CaloShowerAnalysis( "G4Hit_Eemc" , fname_hit_eemc.str().c_str() );
+//	  hitAna_EEMC->AddG4HitNode("G4HIT_EEMC");
+//	  hitAna_EEMC->SetStoreESum( true , 4001 , -0.005 , 40.005 );
+//	  hitAna_EEMC->SetComparison( true , "G4HIT_ENVELOPE_ENVELOPE" );
+//	  hitAna_EEMC->SetComparisonSum( true , "G4HIT_ABSORBER_EEMC" );
+//
+//	  se->registerSubsystem(hitAna_EEMC);
+//	}
+//
+//      if ( do_FEMC )
+//	{
+//	  //...
+//	}
+//
+//      if ( do_FHCAL )
+//	{
+//	  //...
+//	}
+//    }
 
   //----------------------
   // G4Hit analysis for Calorimeter Envelope
@@ -264,106 +280,106 @@ Fun4All_G4_Calorimeter_ZeroField(
   //----------------------
   // Tower analysis for Calorimeter
   //----------------------
-  if ( do_TowerAnalysis )
-    {
-      if ( do_EEMC )
-	{
-	  ostringstream fname_tower_eemc;
-	  fname_tower_eemc.str("");
-	  fname_tower_eemc << "TowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloTowerAnalysis* towerAna_EEMC = new G4CaloTowerAnalysis( "TowerAna_EEMC" , fname_tower_eemc.str().c_str() );
-	  towerAna_EEMC->AddTowerNode("TOWER_EEMC");
-	  se->registerSubsystem(towerAna_EEMC);
-	}
-
-      if ( do_FEMC )
-	{
-	  ostringstream fname_tower_femc;
-	  fname_tower_femc.str("");
-	  fname_tower_femc << "TowerAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloTowerAnalysis* towerAna_FEMC = new G4CaloTowerAnalysis( "TowerAna_FEMC" , fname_tower_femc.str().c_str() );
-	  towerAna_FEMC->AddTowerNode("TOWER_FEMC");
-	  se->registerSubsystem(towerAna_FEMC);
-	}
-
-      if ( do_FHCAL )
-	{
-	  ostringstream fname_tower_fhcal;
-	  fname_tower_fhcal.str("");
-	  fname_tower_fhcal << "TowerAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloTowerAnalysis* towerAna_FHCAL = new G4CaloTowerAnalysis( "TowerAna_FHCAL" , fname_tower_fhcal.str().c_str() );
-	  towerAna_FHCAL->AddTowerNode("TOWER_FHCAL");
-	  se->registerSubsystem(towerAna_FHCAL);
-	}
-    }
+//  if ( do_TowerAnalysis )
+//    {
+//      if ( do_EEMC )
+//	{
+//	  ostringstream fname_tower_eemc;
+//	  fname_tower_eemc.str("");
+//	  fname_tower_eemc << "TowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawTowerAnalysis* towerAna_EEMC = new G4RawTowerAnalysis( "TowerAna_EEMC" , fname_tower_eemc.str().c_str() );
+//	  towerAna_EEMC->AddTowerNode("TOWER_EEMC");
+//	  se->registerSubsystem(towerAna_EEMC);
+//	}
+//
+//      if ( do_FEMC )
+//	{
+//	  ostringstream fname_tower_femc;
+//	  fname_tower_femc.str("");
+//	  fname_tower_femc << "TowerAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawTowerAnalysis* towerAna_FEMC = new G4RawTowerAnalysis( "TowerAna_FEMC" , fname_tower_femc.str().c_str() );
+//	  towerAna_FEMC->AddTowerNode("TOWER_FEMC");
+//	  se->registerSubsystem(towerAna_FEMC);
+//	}
+//
+//      if ( do_FHCAL )
+//	{
+//	  ostringstream fname_tower_fhcal;
+//	  fname_tower_fhcal.str("");
+//	  fname_tower_fhcal << "TowerAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawTowerAnalysis* towerAna_FHCAL = new G4RawTowerAnalysis( "TowerAna_FHCAL" , fname_tower_fhcal.str().c_str() );
+//	  towerAna_FHCAL->AddTowerNode("TOWER_FHCAL");
+//	  se->registerSubsystem(towerAna_FHCAL);
+//	}
+//    }
 
 
   //----------------------
   // Digitized Tower analysis for Calorimeter
   //----------------------
-  if ( do_DigiTowerAnalysis )
-    {
-      if ( do_EEMC )
-	{
-	  ostringstream fname_digi_tower_eemc;
-	  fname_digi_tower_eemc.str("");
-	  fname_digi_tower_eemc << "DigiTowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-				<< "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloTowerAnalysis* digiTowerAna_EEMC = new G4CaloTowerAnalysis( "DigiTowerAna_EEMC" , fname_digi_tower_eemc.str().c_str() );
-	  digiTowerAna_EEMC->AddTowerNode("TOWER_DIGI_EEMC");
-	  se->registerSubsystem(digiTowerAna_EEMC);
-	}
-    }
+//  if ( do_DigiTowerAnalysis )
+//    {
+//      if ( do_EEMC )
+//	{
+//	  ostringstream fname_digi_tower_eemc;
+//	  fname_digi_tower_eemc.str("");
+//	  fname_digi_tower_eemc << "DigiTowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//				<< "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawTowerAnalysis* digiTowerAna_EEMC = new G4RawTowerAnalysis( "DigiTowerAna_EEMC" , fname_digi_tower_eemc.str().c_str() );
+//	  digiTowerAna_EEMC->AddTowerNode("TOWER_DIGI_EEMC");
+//	  se->registerSubsystem(digiTowerAna_EEMC);
+//	}
+//    }
 
 
   //----------------------
   // Cluster analysis for Calorimeter
   //----------------------
-  if ( do_ClusterAnalysis )
-    {
-      if ( do_EEMC )
-	{
-	  ostringstream fname_cluster_eemc;
-	  fname_cluster_eemc.str("");
-	  fname_cluster_eemc << "ClusterAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloClusterAnalysis* clusterAna_EEMC = new G4CaloClusterAnalysis( "ClusterAna_EEMC" , fname_cluster_eemc.str().c_str() );
-	  clusterAna_EEMC->AddClusterNode("CLUSTER_EEMC");
-	  se->registerSubsystem(clusterAna_EEMC);
-	}
-
-      if ( do_FEMC )
-	{
-	  	  ostringstream fname_cluster_femc;
-	  fname_cluster_femc.str("");
-	  fname_cluster_femc << "ClusterAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloClusterAnalysis* clusterAna_FEMC = new G4CaloClusterAnalysis( "ClusterAna_FEMC" , fname_cluster_femc.str().c_str() );
-	  clusterAna_FEMC->AddClusterNode("CLUSTER_FEMC");
-	  se->registerSubsystem(clusterAna_FEMC);
-	}
-
-      if ( do_FHCAL )
-	{
-	  ostringstream fname_cluster_fhcal;
-	  fname_cluster_fhcal.str("");
-	  fname_cluster_fhcal << "ClusterAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-
-	  G4CaloClusterAnalysis* clusterAna_FHCAL = new G4CaloClusterAnalysis( "ClusterAna_FHCAL" , fname_cluster_fhcal.str().c_str() );
-	  clusterAna_FHCAL->AddClusterNode("CLUSTER_FHCAL");
-	  se->registerSubsystem(clusterAna_FHCAL);
-	}
-    }
+//  if ( do_ClusterAnalysis )
+//    {
+//      if ( do_EEMC )
+//	{
+//	  ostringstream fname_cluster_eemc;
+//	  fname_cluster_eemc.str("");
+//	  fname_cluster_eemc << "ClusterAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawClusterAnalysis* clusterAna_EEMC = new G4RawClusterAnalysis( "ClusterAna_EEMC" , fname_cluster_eemc.str().c_str() );
+//	  clusterAna_EEMC->AddClusterNode("CLUSTER_EEMC");
+//	  se->registerSubsystem(clusterAna_EEMC);
+//	}
+//
+//      if ( do_FEMC )
+//	{
+//	  	  ostringstream fname_cluster_femc;
+//	  fname_cluster_femc.str("");
+//	  fname_cluster_femc << "ClusterAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawClusterAnalysis* clusterAna_FEMC = new G4RawClusterAnalysis( "ClusterAna_FEMC" , fname_cluster_femc.str().c_str() );
+//	  clusterAna_FEMC->AddClusterNode("CLUSTER_FEMC");
+//	  se->registerSubsystem(clusterAna_FEMC);
+//	}
+//
+//      if ( do_FHCAL )
+//	{
+//	  ostringstream fname_cluster_fhcal;
+//	  fname_cluster_fhcal.str("");
+//	  fname_cluster_fhcal << "ClusterAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+//			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+//
+//	  G4RawClusterAnalysis* clusterAna_FHCAL = new G4RawClusterAnalysis( "ClusterAna_FHCAL" , fname_cluster_fhcal.str().c_str() );
+//	  clusterAna_FHCAL->AddClusterNode("CLUSTER_FHCAL");
+//	  se->registerSubsystem(clusterAna_FHCAL);
+//	}
+//    }
 
 
   //--------------

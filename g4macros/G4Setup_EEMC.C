@@ -44,11 +44,6 @@ EEMCSetup(PHG4Reco* g4Reco, const int absorberactive = 0)
   g4Reco->registerSubsystem( eecal );
 
 
-  /* load mapping in geometry manager for later use in Fun4All */
-  CaloTowerGeomManager* geoman = CaloTowerGeomManager::instance();
-  geoman->ReadGeometryFromTable( "EEMC" , mapping_eecal.str() );
-
-
   /* 'Envelope' detector to catch leaing energy */
   //  PHG4EnvelopeSubsystem *envelope = new PHG4EnvelopeSubsystem("ENVELOPE");
   //  envelope->OverlapCheck(overlapcheck);

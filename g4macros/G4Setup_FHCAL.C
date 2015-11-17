@@ -48,11 +48,6 @@ FHCALSetup(PHG4Reco* g4Reco, const int absorberactive = 0)
   //G4_FHCal(g4Reco, 350.0, 1.1, 5.0, 100.);
 
 
-  /* Read tower geometry on the fly
-   */
-  CaloTowerGeomManager* geoman = CaloTowerGeomManager::instance();
-  geoman->ReadGeometryFromTable( "FHCAL" , mapping_hhcal.str() );
-
   /**
    * 'spy' tracking layer infront of calorimeter to capture particle positions right before they
    * enter the caorimeter
