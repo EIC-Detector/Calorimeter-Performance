@@ -27,8 +27,8 @@ Fun4All_G4_Calorimeter_ZeroField(
   // What to run
   //======================
 
-  bool do_EEMC = false;
-  bool do_FEMC = false;
+  bool do_EEMC = true;
+  bool do_FEMC = true;
   bool do_FHCAL = true;
 
   bool do_HitAnalysis = false;
@@ -36,6 +36,8 @@ Fun4All_G4_Calorimeter_ZeroField(
   bool do_DigiTowerAnalysis = false;
   bool do_ClusterAnalysis = false;
 
+  //Option to convert DST to human command readable TTree for quick poke around the outputs
+  bool do_DSTReader = true;
   //---------------
   // Load libraries
   //---------------
@@ -44,10 +46,11 @@ Fun4All_G4_Calorimeter_ZeroField(
   const bool verbosity = false; // very slow but very detailed logs
   //const bool verbosity = true; // very slow but very detailed logs
 
-  gSystem->Load("libphool.so"); // core library
+  //  gSystem->Load("libphool.so"); // core library
   gSystem->Load("libfun4all.so"); // core library
   gSystem->Load("libg4detectors.so"); // detector modules
   gSystem->Load("libcemc.so"); // tower, digitization etc for calorimeter
+  gSystem->Load("libg4eval.so");
   //  gSystem->Load("libg4ana_calo.so"); // calorimeter analysis
 
   /* Choose detector configuration */
@@ -131,12 +134,12 @@ Fun4All_G4_Calorimeter_ZeroField(
   if ( do_EEMC )
     {
       ostringstream mapping_eemc;
-      mapping_eecal << getenv("OFFLINE_MAIN") <<
+      mapping_eemc << getenv("OFFLINE_MAIN") <<
 	"/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v002.txt";
-
 
       RawTowerBuilderByHitIndex* tower_EEMC = new RawTowerBuilderByHitIndex("TowerBuilder_EEMC");
       tower_EEMC->Detector("EEMC");
+      tower_EEMC->set_sim_tower_node_prefix("SIM");
       tower_EEMC->GeometryTableFile( mapping_eemc.str() );
 
       se->registerSubsystem(tower_EEMC);
@@ -150,6 +153,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 
       RawTowerBuilderByHitIndex* tower_FEMC = new RawTowerBuilderByHitIndex("TowerBuilder_FEMC");
       tower_FEMC->Detector("FEMC");
+      tower_FEMC->set_sim_tower_node_prefix("SIM");
       tower_FEMC->GeometryTableFile( mapping_femc.str() );
 
       se->registerSubsystem(tower_FEMC);
@@ -163,6 +167,7 @@ Fun4All_G4_Calorimeter_ZeroField(
 
       RawTowerBuilderByHitIndex* tower_FHCAL = new RawTowerBuilderByHitIndex("TowerBuilder_FHCAL");
       tower_FHCAL->Detector("FHCAL");
+      tower_FHCAL->set_sim_tower_node_prefix("SIM");
       tower_FHCAL->GeometryTableFile( mapping_fhcal.str() );
 
       se->registerSubsystem(tower_FHCAL);
@@ -172,32 +177,58 @@ Fun4All_G4_Calorimeter_ZeroField(
   //----------------------
   // Calorimeter Tower Digitization
   //----------------------
-//  if ( do_EEMC )
-//    {
-//      const double EEMC_photoelectron_per_GeV = 500;//500 photon per total GeV deposition
-//
-//      RawTowerDigitizer *TowerDigitizer_EEMC = new RawTowerDigitizer("EEmcRawTowerDigitizer");
-//      TowerDigitizer_EEMC->Detector("EEMC");
-//      TowerDigitizer_EEMC->Verbosity(verbosity);
-//      TowerDigitizer_EEMC->set_sim_tower_node_prefix("");
-//      TowerDigitizer_EEMC->set_calo_tower_node_prefix("DIGI");
-//      TowerDigitizer_EEMC->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitalization);
-//      TowerDigitizer_EEMC->set_pedstal_central_ADC(0);
-//      TowerDigitizer_EEMC->set_pedstal_width_ADC(8);// eRD1 test beam setting
-//      TowerDigitizer_EEMC->set_photonelec_ADC(1);//not simulating ADC discretization error
-//      TowerDigitizer_EEMC->set_photonelec_yield_visible_GeV( EEMC_photoelectron_per_GeV );
-//      TowerDigitizer_EEMC->set_zero_suppression_ADC(16); // eRD1 test beam setting
-//      se->registerSubsystem( TowerDigitizer_EEMC );
-//    }
-//  if ( do_FEMC )
-//    {
-//      //...
-//    }
-//
-//  if ( do_FHCAL )
-//    {
-//      //...
-//    }
+  if ( do_EEMC )
+    {
+      // CMS lead tungstate barrel ECAL at 18 degree centrigrade: 4.5 photoelectrons per MeV
+      const double EEMC_photoelectron_per_GeV = 4500;
+
+      RawTowerDigitizer *TowerDigitizer_EEMC = new RawTowerDigitizer("EEMCRawTowerDigitizer");
+      TowerDigitizer_EEMC->Detector("EEMC");
+      TowerDigitizer_EEMC->Verbosity(verbosity);
+      TowerDigitizer_EEMC->set_raw_tower_node_prefix("RAW");
+      TowerDigitizer_EEMC->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitalization);
+      TowerDigitizer_EEMC->set_pedstal_central_ADC(0);
+      TowerDigitizer_EEMC->set_pedstal_width_ADC(8);// eRD1 test beam setting
+      TowerDigitizer_EEMC->set_photonelec_ADC(1);//not simulating ADC discretization error
+      TowerDigitizer_EEMC->set_photonelec_yield_visible_GeV( EEMC_photoelectron_per_GeV );
+      TowerDigitizer_EEMC->set_zero_suppression_ADC(16); // eRD1 test beam setting
+      se->registerSubsystem( TowerDigitizer_EEMC );
+    }
+
+  if ( do_FEMC )
+    {
+      const double FEMC_photoelectron_per_GeV = 500; //500 photon per total GeV deposition
+
+      RawTowerDigitizer *TowerDigitizer_FEMC = new RawTowerDigitizer("FEMCRawTowerDigitizer");
+      TowerDigitizer_FEMC->Detector("FEMC");
+      TowerDigitizer_FEMC->Verbosity(verbosity);
+      TowerDigitizer_FEMC->set_raw_tower_node_prefix("RAW");
+      TowerDigitizer_FEMC->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitalization);
+      TowerDigitizer_FEMC->set_pedstal_central_ADC(0);
+      TowerDigitizer_FEMC->set_pedstal_width_ADC(8);// eRD1 test beam setting
+      TowerDigitizer_FEMC->set_photonelec_ADC(1);//not simulating ADC discretization error
+      TowerDigitizer_FEMC->set_photonelec_yield_visible_GeV( FEMC_photoelectron_per_GeV );
+      TowerDigitizer_FEMC->set_zero_suppression_ADC(16); // eRD1 test beam setting
+      se->registerSubsystem( TowerDigitizer_FEMC );
+    }
+
+  if ( do_FHCAL )
+    {
+      const double FHCAL_photoelectron_per_GeV = 500;
+
+      RawTowerDigitizer *TowerDigitizer_FHCAL = new RawTowerDigitizer("FHCALRawTowerDigitizer");
+      TowerDigitizer_FHCAL->Detector("FHCAL");
+      TowerDigitizer_FHCAL->Verbosity(verbosity);
+      TowerDigitizer_FHCAL->set_raw_tower_node_prefix("RAW");
+      TowerDigitizer_FHCAL->set_digi_algorithm(RawTowerDigitizer::kSimple_photon_digitalization);
+      TowerDigitizer_FHCAL->set_pedstal_central_ADC(0);
+      TowerDigitizer_FHCAL->set_pedstal_width_ADC(8);// eRD1 test beam setting
+      TowerDigitizer_FHCAL->set_photonelec_ADC(1);//not simulating ADC discretization error
+      TowerDigitizer_FHCAL->set_photonelec_yield_visible_GeV( FHCAL_photoelectron_per_GeV );
+      TowerDigitizer_FHCAL->set_zero_suppression_ADC(16); // eRD1 test beam setting
+      se->registerSubsystem( TowerDigitizer_FHCAL );
+
+    }
 
 
   //----------------------
@@ -389,6 +420,60 @@ Fun4All_G4_Calorimeter_ZeroField(
   // the event loop, the Dummy Input Mgr does just that
   Fun4AllInputManager *in = new Fun4AllDummyInputManager("JADE");
   se->registerInputManager(in);
+
+  // DST Reader
+  if (do_DSTReader)
+    {
+
+      // save a comprehensive  evaluation file
+      PHG4DSTReader* ana = new PHG4DSTReader(string(outputFile) + string("_DSTReader.root"));
+      ana->set_save_particle(true);
+      ana->set_load_all_particle(false);
+      ana->set_load_active_particle(true);
+      ana->set_save_vertex(true);
+
+      if ( do_EEMC )
+	{
+	ana->AddNode("EEMC");
+	ana->AddTower("SIM_EEMC");
+	ana->AddTower("RAW_EEMC");
+	}
+
+      if ( do_FEMC )
+	{
+	ana->AddNode("FEMC");
+	ana->AddTower("SIM_FEMC");
+	ana->AddTower("RAW_FEMC");
+	}
+
+      if ( do_FHCAL )
+	{
+	ana->AddNode("FHCAL");
+	ana->AddTower("SIM_FHCAL");
+	ana->AddTower("RAW_FHCAL");
+	}
+
+      se->registerSubsystem(ana);
+//
+//      //...
+//      //Convert DST to human command readable TTree for quick poke around the outputs
+//      gROOT->LoadMacro("G4_DSTReader.C");
+//
+//      G4DSTreader( outputFile, //
+//          /*int*/ absorberactive ,
+//          /*bool*/ do_svtx ,
+//          /*bool*/ do_preshower ,
+//          /*bool*/ do_cemc ,
+//          /*bool*/ do_hcalin ,
+//          /*bool*/ do_magnet ,
+//          /*bool*/ do_hcalout ,
+//          /*bool*/ do_cemc_twr ,
+//          /*bool*/ do_hcalin_twr ,
+//          /*bool*/ do_magnet  ,
+//          /*bool*/ do_hcalout_twr
+//          );
+
+    }
 
   //-----------------
   // Event processing
