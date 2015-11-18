@@ -13,11 +13,8 @@ class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class Fun4AllHistoManager;
 
-class RawTowerv1;
 class RawTowerContainer;
-
-class RawTowerGeomv2;
-class RawTowerGeomContainerv1;
+class RawTowerGeomContainer;
 
 class TFile;
 class TNtuple;
@@ -68,7 +65,7 @@ protected:
 
   PHG4TruthInfoContainer *_truth_info_container;
   RawTowerContainer *_tower;
-  RawTowerGeomContainerv1 *_towergeom;
+  RawTowerGeomContainer *_towergeom;
 
   std::string _filename;
   std::string _node_name_truth;
