@@ -117,10 +117,13 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   /* Loop over all input nodes for tower */
   for (unsigned i = 0; i < nnodes; i++)
     {
-      RawTowerContainer *_tower = findNode::getClass<RawTowerContainer>(topNode, _node_name_tower.at(i).c_str());
-      RawTowerGeomContainer *_towergeom = findNode::getClass<RawTowerGeomContainer>(topNode, _node_name_tower_geom.at(i).c_str());
+      RawTowerContainer *_tower = NULL;
+      _tower = findNode::getClass<RawTowerContainer>(topNode, _node_name_tower.at(i).c_str());
 
-      if (_tower)
+      RawTowerGeomContainer *_towergeom = NULL;
+      _towergeom = findNode::getClass<RawTowerGeomContainer>(topNode, _node_name_tower_geom.at(i).c_str());
+
+      if (_tower && _towergeom)
 	{
 
 	  /* loop over all towers in the event from this container */
@@ -142,14 +145,14 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
 	      float tower_idx2 = RawTowerDefs::decode_index2( towerid );
 
 	      float x = _towergeom->get_tower_geometry( towerid )->get_center_x();
-	      float y = 0;
-	      float z = 0;
-	      float dx = 0;
-	      float dy = 0;
-	      float dz = 0;
-	      float eta = 0;
-	      float phi = 0;
-	      float r = 0;
+	      float y = _towergeom->get_tower_geometry( towerid )->get_center_y();
+	      float z = _towergeom->get_tower_geometry( towerid )->get_center_z();
+	      float dx = _towergeom->get_tower_geometry( towerid )->get_size_x();
+	      float dy = _towergeom->get_tower_geometry( towerid )->get_size_y();
+	      float dz = _towergeom->get_tower_geometry( towerid )->get_size_z();
+	      float eta = _towergeom->get_tower_geometry( towerid )->get_eta();
+	      float phi = _towergeom->get_tower_geometry( towerid )->get_phi();
+	      float r = _towergeom->get_tower_geometry( towerid )->get_center_radius();
 
 	      /* Fill output tree */
 	      float tower_data[21] = {_nevent,
