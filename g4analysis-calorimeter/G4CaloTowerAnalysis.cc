@@ -109,9 +109,10 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   float gpz = primary->get_pz();
   float ge = primary->get_e();
 
+  float gp = sqrt(gpx*gpx+gpy*gpy+gpz*gpz);
   float gpt = sqrt(gpx*gpx+gpy*gpy);
-  float geta = NAN;
-  if (gpt != 0.0) geta = asinh(gpz/gpt);
+
+  float geta = atanh( gpz / gp );
   float gphi = atan2(gpy,gpx);
 
   /* loop over all towers in the event from this container */
