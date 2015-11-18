@@ -28,11 +28,11 @@ Fun4All_G4_Calorimeter_ZeroField(
   //======================
 
   bool do_EEMC = true;
-  bool do_FEMC = true;
-  bool do_FHCAL = true;
+  bool do_FEMC = false;
+  bool do_FHCAL = false;
 
   bool do_ShowerAnalysis = false;
-  bool do_TowerAnalysis = false;
+  bool do_TowerAnalysis = true;
 
   //Option to convert DST to human command readable TTree for quick poke around the outputs
   bool do_DSTReader = true;
@@ -362,8 +362,9 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  fname_tower_eemc << "TowerAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
 			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
-	  G4RawTowerAnalysis* towerAna_EEMC = new G4RawTowerAnalysis( "TowerAna_EEMC" , fname_tower_eemc.str().c_str() );
-	  towerAna_EEMC->AddTowerNode("TOWER_EEMC");
+	  G4CaloTowerAnalysis* towerAna_EEMC = new G4CaloTowerAnalysis( "TowerAna_EEMC" , fname_tower_eemc.str().c_str() );
+	  towerAna_EEMC->AddTowerNode("TOWER_CALIB_EEMC");
+	  towerAna_EEMC->AddTowerGeometryNode("TOWERGEOM_EEMC");
 	  se->registerSubsystem(towerAna_EEMC);
 	}
 
@@ -374,8 +375,9 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  fname_tower_femc << "TowerAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
 			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
-	  G4RawTowerAnalysis* towerAna_FEMC = new G4RawTowerAnalysis( "TowerAna_FEMC" , fname_tower_femc.str().c_str() );
-	  towerAna_FEMC->AddTowerNode("TOWER_FEMC");
+	  G4CaloTowerAnalysis* towerAna_FEMC = new G4CaloTowerAnalysis( "TowerAna_FEMC" , fname_tower_femc.str().c_str() );
+	  towerAna_FEMC->AddTowerNode("TOWER_CALIB_FEMC");
+	  towerAna_FEMC->AddTowerGeometryNode("TOWERGEOM_FEMC");
 	  se->registerSubsystem(towerAna_FEMC);
 	}
 
@@ -386,8 +388,9 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  fname_tower_fhcal << "TowerAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
 			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
 
-	  G4RawTowerAnalysis* towerAna_FHCAL = new G4RawTowerAnalysis( "TowerAna_FHCAL" , fname_tower_fhcal.str().c_str() );
-	  towerAna_FHCAL->AddTowerNode("TOWER_FHCAL");
+	  G4CaloTowerAnalysis* towerAna_FHCAL = new G4CaloTowerAnalysis( "TowerAna_FHCAL" , fname_tower_fhcal.str().c_str() );
+	  towerAna_FHCAL->AddTowerNode("TOWER_CALIB_FHCAL");
+	  towerAna_FHCAL->AddTowerGeometryNode("TOWERGEOM_FHCAL");
 	  se->registerSubsystem(towerAna_FHCAL);
 	}
     }
