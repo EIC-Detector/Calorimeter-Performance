@@ -5,14 +5,16 @@ INCLUDES = \
   -isystem $(OFFLINE_MAIN)/include/eigen3 \
   -isystem $(OFFLINE_MAIN)/include \
   -isystem $(G4_MAIN)/include \
-  -isystem $(ROOTSYS)/include
+  -isystem $(ROOTSYS)/include \
+  -isystem /direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include
 
 RINCLUDES = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include/eigen3 \
   -I$(OFFLINE_MAIN)/include \
   -I$(G4_MAIN)/include \
-  -I$(ROOTSYS)/include
+  -I$(ROOTSYS)/include \
+  -I/direct/phenix+u/nfeege/sphenixsw/devel/install/g4cemc/include
 
 AM_LDFLAGS = \
   -L$(libdir) \
@@ -34,22 +36,19 @@ libg4ana_calo_la_LDFLAGS = \
 
 pkginclude_HEADERS = \
   G4CaloShowerAnalysis.h \
-  G4CaloTowerAnalysis.h \
-  G4CaloClusterAnalysis.h
+  G4CaloTowerAnalysis.h
 
 #pkginclude_HEADERS = $(include_HEADERS)
 
 libg4ana_calo_la_SOURCES = \
   G4AnaCalo_Dict.C \
   G4CaloShowerAnalysis.cc \
-  G4CaloTowerAnalysis.cc \
-  G4CaloClusterAnalysis.cc
+  G4CaloTowerAnalysis.cc
 
 G4AnaCalo_Dict.C : \
   G4CaloShowerAnalysis.h \
   G4CaloTowerAnalysis.h \
-  G4CaloClusterAnalysis.h \
-  G4AnaCaloLinkDef.h
+  G4CaloAnalysisLinkDef.h
 	rootcint -f $@ -c $(DEFAULT_INCLUDES) $(RINCLUDES) $^
 
 ################################################
