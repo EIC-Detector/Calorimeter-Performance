@@ -41,6 +41,9 @@ class G4CaloTowerAnalysis : public SubsysReco
   /* Full initialization method (called before first event)*/
   int Init(PHCompositeNode *);
 
+  /* Full initialization method for run (called before first event)*/
+  int InitRun(PHCompositeNode *);
+
   /* Event processing method - called for each event */
   int process_event(PHCompositeNode *);
 
@@ -48,15 +51,15 @@ class G4CaloTowerAnalysis : public SubsysReco
   int End(PHCompositeNode *);
 
   /* Set name for node with True particle information */
-  void AddTrueParticleNode(const std::string &name) {_node_name_truth = name;}
+  void SetTrueParticleNode(const std::string &name) {_node_name_truth = name;}
 
   /* Add node name for another tower node (adding multiple nodes will make code
      loop through all of them for each event) */
-  void AddTowerNode(const std::string &name) {_node_name_tower.push_back(name);}
+  void SetTowerNode(const std::string &name) {_node_name_tower = name;}
 
   /* Add node name for another tower geometry node (adding multiple nodes will make code
      loop through all of them for each event) */
-  void AddTowerGeometryNode(const std::string &name) {_node_name_tower_geom.push_back(name);}
+  void SetTowerGeometryNode(const std::string &name) {_node_name_tower_geom = name;}
 
 protected:
 
@@ -69,8 +72,8 @@ protected:
 
   std::string _filename;
   std::string _node_name_truth;
-  std::vector< std::string > _node_name_tower;
-  std::vector< std::string > _node_name_tower_geom;
+  std::string _node_name_tower;
+  std::string _node_name_tower_geom;
 
   int _nevent;
 
