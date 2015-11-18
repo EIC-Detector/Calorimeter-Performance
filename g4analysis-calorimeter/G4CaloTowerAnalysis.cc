@@ -8,14 +8,17 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 
-#include <g4cemc/CaloTowerID.h>
-#include <g4cemc/CaloTowerGeomManager.h>
+#include <g4cemc/RawTowerv1.h>
+#include <g4cemc/RawTowerContainer.h>
+
+#include <g4cemc/RawTowerGeomv2.h>
+#include <g4cemc/RawTowerGeomContainerv1.h>
 
 /* Fun4All includes */
 #include <fun4all/Fun4AllHistoManager.h>
 #include <fun4all/Fun4AllReturnCodes.h>
 
-#include <fun4all/getClass.h>
+#include <phool/getClass.h>
 
 /* ROOT includes */
 #include <TFile.h>
@@ -28,6 +31,7 @@ G4CaloTowerAnalysis::G4CaloTowerAnalysis(const std::string name , const std::str
   SubsysReco( name ),
   _truth_info_container(NULL),
   _tower(NULL),
+  _towergeom(NULL),
   _filename(filename),
   _node_name_truth("G4TruthInfo"),
   _nevent(0),
@@ -70,8 +74,6 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
 
   /* Get truth info */
   PHG4TruthInfoContainer::Map map = _truth_info_container->GetPrimaryMap();
-  //  for (PHG4TruthInfoContainer::ConstIterator iter = map.begin(); iter != map.end();  ++iter)
-  //    {
 
   // select first primary particle in map- assume single-particle event (particle gun)
   PHG4Particle* primary = map.begin()->second;
@@ -88,11 +90,11 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   float geta = NAN;
   if (gpt != 0.0) geta = asinh(gpz/gpt);
   float gphi = atan2(gpy,gpx);
-  //}
 
 
   /* Get Tower from input nodes */
-  unsigned nnodes = _node_tower_names.size();
+  unsigned nnodes = _node_name_tower.size();
+  unsigned ngeomnodes = _node_name_tower_geom.size();
 
   if ( !nnodes )
     {
@@ -100,40 +102,54 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
       return -1;//ABORTEVENT;
     }
 
+  if ( !ngeomnodes )
+    {
+      cout << PHWHERE << " WARNING: No tower geometry node defined." << endl;
+      return -1;//ABORTEVENT;
+    }
+
+  if ( nnodes != ngeomnodes )
+    {
+      cout << PHWHERE << " WARNING: Number of tower and tower geometry nodes do not match." << endl;
+      return -1;//ABORTEVENT;
+    }
+
   /* Loop over all input nodes for tower */
   for (unsigned i = 0; i < nnodes; i++)
     {
-      CaloTowerContainer *_tower = findNode::getClass<CaloTowerContainer>(topNode, _node_tower_names.at(i).c_str());
+      RawTowerContainer *_tower = findNode::getClass<RawTowerContainer>(topNode, _node_name_tower.at(i).c_str());
+      RawTowerGeomContainer *_towergeom = findNode::getClass<RawTowerGeomContainer>(topNode, _node_name_tower_geom.at(i).c_str());
 
       if (_tower)
 	{
 
 	  /* loop over all towers in the event from this container */
-	  CaloTowerContainer::ConstIterator towerit;
-	  CaloTowerContainer::ConstRange towers_begin_end = _tower->getTowers();
+	  RawTowerContainer::ConstIterator towerit;
+	  RawTowerContainer::ConstRange towers_begin_end = _tower->getTowers();
 
-	  CaloTowerv1* tower_i = NULL;
+	  RawTowerv1* tower_i = NULL;
 
 	  for (towerit = towers_begin_end.first; towerit != towers_begin_end.second; towerit++)
 	    {
 	      /* Get raw tower and energy */
-	      tower_i= dynamic_cast<CaloTowerv1*>( (*towerit).second );
+	      tower_i= dynamic_cast<RawTowerv1*>( (*towerit).second );
 
-	      unsigned int towerid = tower_i->get_id();
+	      RawTowerDefs::keytype towerid = tower_i->get_id();
 	      float e = tower_i->get_energy();
 
-	      float calo_id = calotowerid::DecodeCalorimeterId( towerid );
-	      float tower_idx1 = calotowerid::DecodeTowerIndex1( towerid );
-	      float tower_idx2 = calotowerid::DecodeTowerIndex2( towerid );
+	      float calo_id = RawTowerDefs::decode_caloid( towerid );
+	      float tower_idx1 = RawTowerDefs::decode_index1( towerid );
+	      float tower_idx2 = RawTowerDefs::decode_index2( towerid );
 
-	      /* Get geometry manager for calorimeter towers */
-	      CaloTowerGeomManager *geoman = CaloTowerGeomManager::instance();
-
-	      float x,y,z,dx,dy,dz,eta,phi,r;
-	      geoman->GetPositionXYZ( towerid , x, y, z );
-	      geoman->GetSizeXYZ( towerid , dx, dy, dz );
-	      geoman->GetPositionEtaPhiR( towerid , eta, phi, r );
-
+	      float x = _towergeom->get_tower_geometry( towerid )->get_center_x();
+	      float y = 0;
+	      float z = 0;
+	      float dx = 0;
+	      float dy = 0;
+	      float dz = 0;
+	      float eta = 0;
+	      float phi = 0;
+	      float r = 0;
 
 	      /* Fill output tree */
 	      float tower_data[21] = {_nevent,
@@ -166,31 +182,32 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
 	      if ( _nevent == 1 )
 		{
 		  cout << "*** Event #" << _nevent << " Tower ("
-		       << calotowerid::DecodeCalorimeterName( towerid ) << " , "
-		       << calotowerid::DecodeTowerIndex1( towerid ) << " , "
-		       << calotowerid::DecodeTowerIndex2( towerid ) << ") : "
+		       << RawTowerDefs::convert_caloid_to_name( RawTowerDefs::decode_caloid( towerid ) ) << " , "
+		       << RawTowerDefs::decode_index1( towerid ) << " , "
+		       << RawTowerDefs::decode_index2( towerid ) << ") : "
 		       << tower_i->get_energy() <<  endl;
-
-		  vector< unsigned int > v_tower_neighbors = geoman->GetNeighbors( towerid );
 
 		  cout << "** Position:   x = " << x << " ,  y = " << y << " ,  z = " << z << endl;
 		  cout << "** Dimension: dx = " << dx << " , dy = " << dy << " , dz = " << dz << endl;
 
-		  for ( unsigned i = 0; i < v_tower_neighbors.size(); i++ )
-		    {
-		      /* energy of neighbo tower */
-		      float e_neighbor = 0;
-
-		      /* Check if neighbor tower has energy deposit */
-		      if ( (_tower->getTower( v_tower_neighbors.at( i ) )) )
-			e_neighbor = (_tower->getTower( v_tower_neighbors.at( i ) ))->get_energy();
-
-		      cout << "* Adjacent Tower ("
-			   << calotowerid::DecodeCalorimeterName( v_tower_neighbors.at( i ) ) << " , "
-			   << calotowerid::DecodeTowerIndex1( v_tower_neighbors.at( i ) ) << " , "
-			   << calotowerid::DecodeTowerIndex2( v_tower_neighbors.at( i ) ) << ") : "
-			   << e_neighbor << endl;
-		    }
+		  /* print neighbor information */
+		  //vector< unsigned int > v_tower_neighbors = geoman->GetNeighbors( towerid );
+		  //
+		  //for ( unsigned i = 0; i < v_tower_neighbors.size(); i++ )
+		  //  {
+		  //    /* energy of neighbo tower */
+		  //    float e_neighbor = 0;
+		  //
+		  //    /* Check if neighbor tower has energy deposit */
+		  //    if ( (_tower->getTower( v_tower_neighbors.at( i ) )) )
+		  //	e_neighbor = (_tower->getTower( v_tower_neighbors.at( i ) ))->get_energy();
+		  //
+		  //    cout << "* Adjacent Tower ("
+		  //	   << calotowerid::DecodeCalorimeterName( v_tower_neighbors.at( i ) ) << " , "
+		  //	   << calotowerid::DecodeTowerIndex1( v_tower_neighbors.at( i ) ) << " , "
+		  //	   << calotowerid::DecodeTowerIndex2( v_tower_neighbors.at( i ) ) << ") : "
+		  //	   << e_neighbor << endl;
+		  //  }
 		}
 	    }
 	}

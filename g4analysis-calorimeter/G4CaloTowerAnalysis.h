@@ -1,10 +1,6 @@
 #ifndef _G4_CALO_TOWER_ANALYSIS_H_
 #define _G4_CALO_TOWER_ANALYSIS_H_
 
-/*g4cemc includes */
-#include <g4cemc/CaloTowerv1.h>
-#include <g4cemc/CaloTowerContainer.h>
-
 /* STL includes */
 #include <string>
 #include <vector>
@@ -17,9 +13,11 @@ class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class Fun4AllHistoManager;
 
-class CaloTower;
-class CaloTowerv1;
-class CaloTowerContainer;
+class RawTowerv1;
+class RawTowerContainer;
+
+class RawTowerGeomv2;
+class RawTowerGeomContainerv1;
 
 class TFile;
 class TNtuple;
@@ -54,7 +52,11 @@ class G4CaloTowerAnalysis : public SubsysReco
 
   /* Add node name for another tower node (adding multiple nodes will make code
      loop through all of them for each event) */
-  void AddTowerNode(const std::string &name) {_node_tower_names.push_back(name);}
+  void AddTowerNode(const std::string &name) {_node_name_tower.push_back(name);}
+
+  /* Add node name for another tower geometry node (adding multiple nodes will make code
+     loop through all of them for each event) */
+  void AddTowerGeometryNode(const std::string &name) {_node_name_tower_geom.push_back(name);}
 
 protected:
 
@@ -62,11 +64,13 @@ protected:
   TFile *_outfile;
 
   PHG4TruthInfoContainer *_truth_info_container;
-  CaloTowerContainer *_tower;
+  RawTowerContainer *_tower;
+  RawTowerGeomContainerv1 *_towergeom;
 
   std::string _filename;
   std::string _node_name_truth;
-  std::vector< std::string > _node_tower_names;
+  std::vector< std::string > _node_name_tower;
+  std::vector< std::string > _node_name_tower_geom;
 
   int _nevent;
 
