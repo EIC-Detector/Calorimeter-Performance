@@ -17,7 +17,7 @@ class RawTowerContainer;
 class RawTowerGeomContainer;
 
 class TFile;
-class TNtuple;
+class TTree;
 
 /** Analyze tower in calorimeter and store information in ROOT output file.
  *
@@ -74,7 +74,42 @@ protected:
 
   int _nevent;
 
-  TNtuple* _t_tower;
+  TTree* _t_tower;
+  TTree* _t_event;
+
+  /* common variables for _t_tower and _t_event */
+  int _event;
+
+  /* _t_tower variables */
+  static const int _maxtower = 1000;
+  int _ntower;
+  int _towerID[_maxtower];
+  int _idx1[_maxtower];
+  int _idx2[_maxtower];
+  float _x[_maxtower];
+  float _y[_maxtower];
+  float _z[_maxtower];
+  float _eta[_maxtower];
+  float _phi[_maxtower];
+  float _r[_maxtower];
+  float _volume[_maxtower];
+  float _e[_maxtower];
+
+  /*  _t_event variables */
+  static const int _maxprimary = 100;
+  int _nprimary;
+  int _gparticleID[_maxprimary];
+  int _gflavor[_maxprimary];
+  float _gpx[_maxprimary];
+  float _gpy[_maxprimary];
+  float _gpz[_maxprimary];
+  float _geta[_maxprimary];
+  float _gphi[_maxprimary];
+  float _ge[_maxprimary];
+  float _gp[_maxprimary];
+  float _gpt[_maxprimary];
+  float _e_tower_sum;
+
 };
 
 #endif

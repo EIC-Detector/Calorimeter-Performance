@@ -22,7 +22,7 @@
 
 /* ROOT includes */
 #include <TFile.h>
-#include <TNtuple.h>
+#include <TTree.h>
 #include <TMath.h>
 
 using namespace std;
@@ -37,7 +37,8 @@ G4CaloTowerAnalysis::G4CaloTowerAnalysis(const std::string name , const std::str
   _node_name_tower("NONE"),
   _node_name_tower_geom("NONE"),
   _nevent(0),
-  _t_tower(NULL)
+  _t_tower(NULL),
+  _t_event(NULL)
 {
 
 }
@@ -52,11 +53,37 @@ int G4CaloTowerAnalysis::Init( PHCompositeNode* topNode )
   /* Create new output file */
   _outfile = new TFile(_filename.c_str(), "RECREATE");
 
-  _t_tower = new TNtuple("t_tower","tower information",
-			 "event:caloID:towerID:idx1:idx2:x:y:z:eta:phi:r:"
-			 "dx:dy:dz:e:"
-			 "gparticleID:gflavor:"
-			 "geta:gphi:ge:gpt");
+  /* Create tree _t_tower */
+  _t_tower = new TTree("t_tower", "Tower information");
+  _t_tower->Branch( "event", &_event, "event/I" );
+  _t_tower->Branch( "ntower", &_ntower, "ntower/I" );
+  _t_tower->Branch( "towerID", &_towerID, "towerID[ntower]/I" );
+  _t_tower->Branch( "index1", &_idx1, "index1[ntower]/I" );
+  _t_tower->Branch( "index2", &_idx2, "index2[ntower]/I" );
+  _t_tower->Branch( "x", &_x, "x[ntower]/F" );
+  _t_tower->Branch( "y", &_y, "y[ntower]/F" );
+  _t_tower->Branch( "z", &_e, "z[ntower]/F" );
+  _t_tower->Branch( "eta", &_eta, "eta[ntower]/F" );
+  _t_tower->Branch( "phi", &_phi, "phi[ntower]/F" );
+  _t_tower->Branch( "r", &_r, "r[ntower]/F" );
+  _t_tower->Branch( "volume", &_volume, "volume[ntower]/F" );
+  _t_tower->Branch( "e", &_e, "e[ntower]/F" );
+
+  /* Create tree _t_event */
+  _t_event = new TTree("t_event", "Event information");
+  _t_event->Branch( "event", &_event, "event/I" );
+  _t_event->Branch( "e_tower_sum", &_e_tower_sum, "e_tower_sum/F" );
+  _t_event->Branch( "nprimary", &_nprimary, "nprimary/I" );
+  _t_event->Branch( "gparticleID", &_gparticleID, "gparticleID[nprimary]/I" );
+  _t_event->Branch( "gflavor", &_gflavor, "gflavor[nprimary]/I" );
+  _t_event->Branch( "gpx", &_gpx, "gpx[nprimary]/F" );
+  _t_event->Branch( "gpy", &_gpy, "gpy[nprimary]/F" );
+  _t_event->Branch( "gpz", &_gpz, "gpz[nprimary]/F" );
+  _t_event->Branch( "geta", &_geta, "geta[nprimary]/F" );
+  _t_event->Branch( "gphi", &_gphi, "gphi[nprimary]/F" );
+  _t_event->Branch( "ge", &_ge, "ge[nprimary]/F" );
+  _t_event->Branch( "gp", &_gp, "gp[nprimary]/F" );
+  _t_event->Branch( "gpt", &_gpt, "gpt[nprimary]/F" );
 
   return 0;
 }
@@ -101,107 +128,70 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   // select first primary particle in map- assume single-particle event (particle gun)
   PHG4Particle* primary = map.begin()->second;
 
-  float gpid = primary->get_track_id();
-  float gflavor = primary->get_pid();
+  _nprimary = 1;
 
-  float gpx = primary->get_px();
-  float gpy = primary->get_py();
-  float gpz = primary->get_pz();
-  float ge = primary->get_e();
+  _gparticleID[_nprimary-1] = primary->get_track_id();
+  _gflavor[_nprimary-1] = primary->get_pid();
 
-  float gp = sqrt(gpx*gpx+gpy*gpy+gpz*gpz);
-  float gpt = sqrt(gpx*gpx+gpy*gpy);
+  _gpx[_nprimary-1] = primary->get_px();
+  _gpy[_nprimary-1] = primary->get_py();
+  _gpz[_nprimary-1] = primary->get_pz();
+  _ge[_nprimary-1] = primary->get_e();
 
-  float geta = atanh( gpz / gp );
-  float gphi = atan2(gpy,gpx);
+  _gp[_nprimary-1] = sqrt(_gpx[_nprimary-1] *_gpx[_nprimary-1] +_gpy[_nprimary-1] *_gpy[_nprimary-1] +_gpz[_nprimary-1] *_gpz[_nprimary-1] );
+  _gpt[_nprimary-1] = sqrt(_gpx[_nprimary-1] *_gpx[_nprimary-1] +_gpy[_nprimary-1] *_gpy[_nprimary-1] );
+
+  _geta[_nprimary-1] = atanh( _gpz[_nprimary-1] /_gp[_nprimary-1] );
+  _gphi[_nprimary-1] = atan2( _gpy[_nprimary-1] , _gpx[_nprimary-1] );
 
   /* loop over all towers in the event from this container */
   RawTowerContainer::ConstIterator towerit;
   RawTowerContainer::ConstRange towers_begin_end = _tower->getTowers();
 
   RawTowerv1* tower_i = NULL;
+  _ntower = 0;
+  _e_tower_sum = 0;
 
   for (towerit = towers_begin_end.first; towerit != towers_begin_end.second; towerit++)
     {
+      _ntower++;
+
       /* Get raw tower and energy */
       tower_i= dynamic_cast<RawTowerv1*>( (*towerit).second );
 
       RawTowerDefs::keytype towerid = tower_i->get_id();
-      float e = tower_i->get_energy();
+      _towerID[_ntower-1] = towerid;
+      _e[_ntower-1] = tower_i->get_energy();
+      _e_tower_sum += _e[_ntower-1];
 
-      float calo_id = RawTowerDefs::decode_caloid( towerid );
-      float tower_idx1 = RawTowerDefs::decode_index1( towerid );
-      float tower_idx2 = RawTowerDefs::decode_index2( towerid );
+      _idx1[_ntower-1] = RawTowerDefs::decode_index1( towerid );
+      _idx2[_ntower-1] = RawTowerDefs::decode_index2( towerid );
 
-      float x = _towergeom->get_tower_geometry( towerid )->get_center_x();
-      float y = _towergeom->get_tower_geometry( towerid )->get_center_y();
-      float z = _towergeom->get_tower_geometry( towerid )->get_center_z();
-      float dx = _towergeom->get_tower_geometry( towerid )->get_size_x();
-      float dy = _towergeom->get_tower_geometry( towerid )->get_size_y();
-      float dz = _towergeom->get_tower_geometry( towerid )->get_size_z();
-      float eta = _towergeom->get_tower_geometry( towerid )->get_eta();
-      float phi = _towergeom->get_tower_geometry( towerid )->get_phi();
-      float r = _towergeom->get_tower_geometry( towerid )->get_center_radius();
+      _x[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_center_x();
+      _y[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_center_y();
+      _z[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_center_z();
 
-      /* Fill output tree */
-      float tower_data[21] = {_nevent,
-			      calo_id,
-			      towerid,
-			      tower_idx1,
-			      tower_idx2,
-			      x,
-			      y,
-			      z,
-			      eta,
-			      phi,
-			      r,
-			      dx,
-			      dy,
-			      dz,
-			      e,
-			      gpid,
-			      gflavor,
-			      geta,
-			      gphi,
-			      ge,
-			      gpt
-      };
+      _volume[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_volume();
 
-      _t_tower->Fill(tower_data);
+      _eta[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_eta();
+      _phi[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_phi();
+      _r[_ntower-1] = _towergeom->get_tower_geometry( towerid )->get_center_radius();
 
 
-      /* Print tower and neighbor information */
-      if ( _nevent == 1 && verbosity > 2 )
+      /* Print tower information */
+      if ( verbosity > 2 )
 	{
 	  cout << "*** Event #" << _nevent << " Tower ("
 	       << RawTowerDefs::convert_caloid_to_name( RawTowerDefs::decode_caloid( towerid ) ) << " , "
 	       << RawTowerDefs::decode_index1( towerid ) << " , "
 	       << RawTowerDefs::decode_index2( towerid ) << ") : "
 	       << tower_i->get_energy() <<  endl;
-
-	  cout << "** Position:   x = " << x << " ,  y = " << y << " ,  z = " << z << endl;
-	  cout << "** Dimension: dx = " << dx << " , dy = " << dy << " , dz = " << dz << endl;
-
-	  /* print neighbor information */
-	  //vector< unsigned int > v_tower_neighbors = geoman->GetNeighbors( towerid );
-	  //
-	  //for ( unsigned i = 0; i < v_tower_neighbors.size(); i++ )
-	  //  {
-	  //    /* energy of neighbo tower */
-	  //    float e_neighbor = 0;
-	  //
-	  //    /* Check if neighbor tower has energy deposit */
-	  //    if ( (_tower->getTower( v_tower_neighbors.at( i ) )) )
-	  //	e_neighbor = (_tower->getTower( v_tower_neighbors.at( i ) ))->get_energy();
-	  //
-	  //    cout << "* Adjacent Tower ("
-	  //	   << calotowerid::DecodeCalorimeterName( v_tower_neighbors.at( i ) ) << " , "
-	  //	   << calotowerid::DecodeTowerIndex1( v_tower_neighbors.at( i ) ) << " , "
-	  //	   << calotowerid::DecodeTowerIndex2( v_tower_neighbors.at( i ) ) << ") : "
-	  //	   << e_neighbor << endl;
-	  //  }
 	}
     }
+
+  /* Fill output tree */
+  _t_tower->Fill();
+  _t_event->Fill();
 
   return 0;
 }
@@ -214,6 +204,7 @@ int G4CaloTowerAnalysis::End(PHCompositeNode * topNode)
 
   /* Write tree to output file */
   _t_tower->Write();
+  _t_event->Write();
 
   /* Write & Close output file */
   _outfile->Write();
