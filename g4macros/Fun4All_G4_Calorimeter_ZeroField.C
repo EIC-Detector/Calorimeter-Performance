@@ -134,7 +134,7 @@ Fun4All_G4_Calorimeter_ZeroField(
     {
       ostringstream mapping_eemc;
       mapping_eemc << getenv("OFFLINE_MAIN") <<
-	"/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v002.txt";
+	"/share/calibrations/CrystalCalorimeter/mapping/towerMap_EEMC_v003.txt";
 
       RawTowerBuilderByHitIndex* tower_EEMC = new RawTowerBuilderByHitIndex("TowerBuilder_EEMC");
       tower_EEMC->Detector("EEMC");
@@ -148,7 +148,7 @@ Fun4All_G4_Calorimeter_ZeroField(
     {
       ostringstream mapping_femc;
       mapping_femc << getenv("OFFLINE_MAIN") <<
-	"/share/calibrations/ForwardEcal/mapping/towerMap_FEMC_v002.txt";
+	"/share/calibrations/ForwardEcal/mapping/towerMap_FEMC_v003.txt";
 
       RawTowerBuilderByHitIndex* tower_FEMC = new RawTowerBuilderByHitIndex("TowerBuilder_FEMC");
       tower_FEMC->Detector("FEMC");
@@ -162,7 +162,7 @@ Fun4All_G4_Calorimeter_ZeroField(
     {
       ostringstream mapping_fhcal;
       mapping_fhcal << getenv("OFFLINE_MAIN") <<
-	"/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v002.txt";
+	"/share/calibrations/ForwardHcal/mapping/towerMap_FHCAL_v003.txt";
 
       RawTowerBuilderByHitIndex* tower_FHCAL = new RawTowerBuilderByHitIndex("TowerBuilder_FHCAL");
       tower_FHCAL->Detector("FHCAL");
@@ -274,34 +274,6 @@ Fun4All_G4_Calorimeter_ZeroField(
 
 
   //----------------------
-  // Build Calorimeter Cluster
-  //----------------------
-//  if ( do_EEMC )
-//    {
-//      RawClusterBuilder* cluster_EEMC = new RawClusterBuilder("EEMCClusterBuilder");
-//      cluster_EEMC->Detector("EEMC");
-//      cluster_EEMC->Verbosity(verbosity);
-//      se->registerSubsystem(cluster_EEMC);
-//    }
-//
-//  if ( do_FEMCg )
-//    {
-//      RawClusterBuilder* cluster_FEMC = new RawClusterBuilder("FEMCClusterBuilder");
-//      cluster_FEMC->Detector("FEMC");
-//      cluster_FEMC->Verbosity(verbosity);
-//      se->registerSubsystem(cluster_FEMC);
-//    }
-//
-//  if ( do_FHCAL )
-//    {
-//      RawClusterBuilder* cluster_FHCAL = new RawClusterBuilder("FHCALClusterBuilder");
-//      cluster_FHCAL->Detector("FHCAL");
-//      cluster_FHCAL->Verbosity(verbosity);
-//      se->registerSubsystem(cluster_FHCAL);
-//    }
-
-
-  //----------------------
   // G4Hit analysis for Calorimeter
   //----------------------
   if ( do_ShowerAnalysis )
@@ -366,6 +338,29 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  towerAna_EEMC->SetTowerNode("TOWER_CALIB_EEMC");
 	  towerAna_EEMC->SetTowerGeometryNode("TOWERGEOM_EEMC");
 	  se->registerSubsystem(towerAna_EEMC);
+
+	  // SIM
+	  ostringstream fname_tower_eemc_sim;
+	  fname_tower_eemc_sim.str("");
+	  fname_tower_eemc_sim << "TowerAna_EEMC_SIM" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_EEMC_sim = new G4CaloTowerAnalysis( "TowerAna_EEMC_sim" , fname_tower_eemc_sim.str().c_str() );
+	  towerAna_EEMC_sim->SetTowerNode("TOWER_SIM_EEMC");
+	  towerAna_EEMC_sim->SetTowerGeometryNode("TOWERGEOM_EEMC");
+	  se->registerSubsystem(towerAna_EEMC_sim);
+
+	  // DIGI
+	  ostringstream fname_tower_eemc_raw;
+	  fname_tower_eemc_raw.str("");
+	  fname_tower_eemc_raw << "TowerAna_EEMC_RAW" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_EEMC_raw = new G4CaloTowerAnalysis( "TowerAna_EEMC_raw" , fname_tower_eemc_raw.str().c_str() );
+	  towerAna_EEMC_raw->SetTowerNode("TOWER_RAW_EEMC");
+	  towerAna_EEMC_raw->SetTowerGeometryNode("TOWERGEOM_EEMC");
+	  se->registerSubsystem(towerAna_EEMC_raw);
+
 	}
 
       if ( do_FEMC )
@@ -379,6 +374,29 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  towerAna_FEMC->SetTowerNode("TOWER_CALIB_FEMC");
 	  towerAna_FEMC->SetTowerGeometryNode("TOWERGEOM_FEMC");
 	  se->registerSubsystem(towerAna_FEMC);
+
+	  // SIM
+	  ostringstream fname_tower_femc_sim;
+	  fname_tower_femc_sim.str("");
+	  fname_tower_femc_sim << "TowerAna_FEMC_SIM" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_FEMC_sim = new G4CaloTowerAnalysis( "TowerAna_FEMC_sim" , fname_tower_femc_sim.str().c_str() );
+	  towerAna_FEMC_sim->SetTowerNode("TOWER_SIM_FEMC");
+	  towerAna_FEMC_sim->SetTowerGeometryNode("TOWERGEOM_FEMC");
+	  se->registerSubsystem(towerAna_FEMC_sim);
+
+	  // DIGI
+	  ostringstream fname_tower_femc_raw;
+	  fname_tower_femc_raw.str("");
+	  fname_tower_femc_raw << "TowerAna_FEMC_RAW" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_FEMC_raw = new G4CaloTowerAnalysis( "TowerAna_FEMC_raw" , fname_tower_femc_raw.str().c_str() );
+	  towerAna_FEMC_raw->SetTowerNode("TOWER_RAW_FEMC");
+	  towerAna_FEMC_raw->SetTowerGeometryNode("TOWERGEOM_FEMC");
+	  se->registerSubsystem(towerAna_FEMC_raw);
+
 	}
 
       if ( do_FHCAL )
@@ -392,51 +410,31 @@ Fun4All_G4_Calorimeter_ZeroField(
 	  towerAna_FHCAL->SetTowerNode("TOWER_CALIB_FHCAL");
 	  towerAna_FHCAL->SetTowerGeometryNode("TOWERGEOM_FHCAL");
 	  se->registerSubsystem(towerAna_FHCAL);
+
+	  // SIM
+	  ostringstream fname_tower_fhcal_sim;
+	  fname_tower_fhcal_sim.str("");
+	  fname_tower_fhcal_sim << "TowerAna_FHCAL_SIM" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_FHCAL_sim = new G4CaloTowerAnalysis( "TowerAna_FHCAL_sim" , fname_tower_fhcal_sim.str().c_str() );
+	  towerAna_FHCAL_sim->SetTowerNode("TOWER_SIM_FHCAL");
+	  towerAna_FHCAL_sim->SetTowerGeometryNode("TOWERGEOM_FHCAL");
+	  se->registerSubsystem(towerAna_FHCAL_sim);
+
+	  // DIGI
+	  ostringstream fname_tower_fhcal_raw;
+	  fname_tower_fhcal_raw.str("");
+	  fname_tower_fhcal_raw << "TowerAna_FHCAL_RAW" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
+			   << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
+
+	  G4CaloTowerAnalysis* towerAna_FHCAL_raw = new G4CaloTowerAnalysis( "TowerAna_FHCAL_raw" , fname_tower_fhcal_raw.str().c_str() );
+	  towerAna_FHCAL_raw->SetTowerNode("TOWER_RAW_FHCAL");
+	  towerAna_FHCAL_raw->SetTowerGeometryNode("TOWERGEOM_FHCAL");
+	  se->registerSubsystem(towerAna_FHCAL_raw);
+
 	}
     }
-
-
-  //----------------------
-  // Cluster analysis for Calorimeter
-  //----------------------
-//  if ( do_ClusterAnalysis )
-//    {
-//      if ( do_EEMC )
-//	{
-//	  ostringstream fname_cluster_eemc;
-//	  fname_cluster_eemc.str("");
-//	  fname_cluster_eemc << "ClusterAna_EEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-//			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-//
-//	  G4RawClusterAnalysis* clusterAna_EEMC = new G4RawClusterAnalysis( "ClusterAna_EEMC" , fname_cluster_eemc.str().c_str() );
-//	  clusterAna_EEMC->AddClusterNode("CLUSTER_EEMC");
-//	  se->registerSubsystem(clusterAna_EEMC);
-//	}
-//
-//      if ( do_FEMC )
-//	{
-//	  	  ostringstream fname_cluster_femc;
-//	  fname_cluster_femc.str("");
-//	  fname_cluster_femc << "ClusterAna_FEMC" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-//			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-//
-//	  G4RawClusterAnalysis* clusterAna_FEMC = new G4RawClusterAnalysis( "ClusterAna_FEMC" , fname_cluster_femc.str().c_str() );
-//	  clusterAna_FEMC->AddClusterNode("CLUSTER_FEMC");
-//	  se->registerSubsystem(clusterAna_FEMC);
-//	}
-//
-//      if ( do_FHCAL )
-//	{
-//	  ostringstream fname_cluster_fhcal;
-//	  fname_cluster_fhcal.str("");
-//	  fname_cluster_fhcal << "ClusterAna_FHCAL" << "_p_"<< ppmin << "_" << ppmax << "_GeV"
-//			     << "_eta_"  << petamin << "_" << petamax <<  "_" << "phi_" << phimin << "_" << phimax << "_" << nEvents << ".root" ;
-//
-//	  G4RawClusterAnalysis* clusterAna_FHCAL = new G4RawClusterAnalysis( "ClusterAna_FHCAL" , fname_cluster_fhcal.str().c_str() );
-//	  clusterAna_FHCAL->AddClusterNode("CLUSTER_FHCAL");
-//	  se->registerSubsystem(clusterAna_FHCAL);
-//	}
-//    }
 
 
   //--------------
@@ -507,34 +505,27 @@ Fun4All_G4_Calorimeter_ZeroField(
   //-----------------
   // Event processing
   //-----------------
-  if (nEvents <= 1)
+  if (nEvents <= 0)
     {
+      return;
+    }
+
+  if (verbosity)
+    {
+      se->Verbosity(3);
       PHG4Reco *g4 = (PHG4Reco *) se->getSubsysReco("PHG4RECO");
-      g4->ApplyCommand("/control/execute eic.mac");
-      se->run(1);
-
-      se->End();
-      std::cout << "All done" << std::endl;
+      g4->Verbosity(3);
+      g4->ApplyCommand("/control/verbose 5");
+      g4->ApplyCommand("/run/verbose  5");
+      g4->ApplyCommand("/tracking/verbose 5");
     }
-  else
-    {
-      if (verbosity)
-        {
-          se->Verbosity(3);
-          PHG4Reco *g4 = (PHG4Reco *) se->getSubsysReco("PHG4RECO");
-          g4->Verbosity(3);
-          g4->ApplyCommand("/control/verbose 5");
-          g4->ApplyCommand("/run/verbose  5");
-          g4->ApplyCommand("/tracking/verbose 5");
-       }
 
-      se->run(nEvents);
+  se->run(nEvents);
 
-      se->End();
-      std::cout << "All done" << std::endl;
-      delete se;
-      gSystem->Exit(0);
-    }
+  se->End();
+  std::cout << "All done" << std::endl;
+  delete se;
+  gSystem->Exit(0);
 
   //-----
   // Exit
