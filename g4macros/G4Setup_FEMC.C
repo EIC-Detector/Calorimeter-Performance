@@ -33,7 +33,7 @@ FEMCSetup(PHG4Reco* g4Reco, const int absorberactive = 0)
   /* path to central copy of calibrations repositry */
   mapping_femc << getenv("OFFLINE_MAIN") << "/share/calibrations";
 
-  mapping_femc << "/ForwardEcal/mapping/towerMap_FEMC_v002.txt";
+  mapping_femc << "/ForwardEcal/mapping/towerMap_FEMC_v003.txt";
 
   cout << mapping_femc.str() << endl;
 

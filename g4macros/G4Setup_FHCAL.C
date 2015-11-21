@@ -33,7 +33,7 @@ FHCALSetup(PHG4Reco* g4Reco, const int absorberactive = 0)
   /* path to central copy of calibrations repositry */
   mapping_hhcal << getenv("OFFLINE_MAIN") << "/share/calibrations";
 
-  mapping_hhcal << "/ForwardHcal/mapping/towerMap_FHCAL_v002.txt";
+  mapping_hhcal << "/ForwardHcal/mapping/towerMap_FHCAL_v003.txt";
   cout << mapping_hhcal.str() << endl;
 
   hhcal->SetTowerMappingFile( mapping_hhcal.str() );
