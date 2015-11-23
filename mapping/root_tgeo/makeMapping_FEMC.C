@@ -1,23 +1,32 @@
 makeMapping_FEMC()
 {
+  /* Global detector position / transformation */
+  float femc_x0 =  0.0; // cm,
+  float femc_y0 =  0.0; // cm,
+  float femc_z0 = 315.0; // cm,
+
+  float femc_rot_x0 =  0.0;
+  float femc_rot_y0 =  0.0;
+  float femc_rot_z0 =  0.0;
+
+  /* Detector envelope size (conde shape) */
   float femc_rmin1 = 11; // cm
   float femc_rmax1 = 225; // cm
   float femc_rmin2 = 12; // cm
   float femc_rmax2 = 246; // cm
+  float femc_dz = 17; // cm
 
+  /* Tower parameters */
   float tower_dx = 3.0; // cm
   float tower_dy = 3.0; // cm
   float tower_dz = 17.0; // cm
-
-  // all towers at fixed z position which is center of mother volume
-  float zpos = 315; // cm;
 
   unsigned n_towers_j = 200;
   unsigned n_towers_k = n_towers_j;
 
   unsigned j_center = n_towers_j / 2 + 1;
   unsigned k_center = j_center;
- 
+
   float xpos_j0_k0 = -1 * ( (float)( n_towers_j - 1 ) / 2 ) * tower_dx - tower_dx;;
   float ypos_j0_k0 = xpos_j0_k0;
 
@@ -29,7 +38,27 @@ makeMapping_FEMC()
 
   // create map
   ofstream fout("towerMap_FEMC_latest.txt");
-  fout << "#idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],dx[cm],dy[cm],dz[cm],alpha,beta,gamma,type" << endl;
+
+  /* Global detector transformation */
+  fout << "#Global detector geometry and transforamtion; lengths given in cm" << endl;
+  fout << "Gtype " << 1 << endl;
+  fout << "Gr1_inner " << femc_rmin1 << endl;
+  fout << "Gr1_outer " << femc_rmax1 << endl;
+  fout << "Gr2_inner " << femc_rmin2 << endl;
+  fout << "Gr2_outer " << femc_rmax2 << endl;
+  fout << "Gdz " << femc_dz << endl;
+  fout << "Gx0 " << femc_x0 << endl;
+  fout << "Gy0 " << femc_y0 << endl;
+  fout << "Gz0 " << femc_z0 << endl;
+  fout << "Grot_x " << femc_rot_x0 << endl;
+  fout << "Grot_y " << femc_rot_y0 << endl;
+  fout << "Grot_z " << femc_rot_z0 << endl;
+  fout << "Gtower_dx " << tower_dx << endl;
+  fout << "Gtower_dy " << tower_dy << endl;
+  fout << "Gtower_dz " << tower_dz << endl;
+
+  /* Tower mapping */
+  fout << "#Tower type,idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],dx[cm],dy[cm],dz[cm],rot_x,rot_y,rot_z" << endl;
 
   float r_min = femc_rmin2;
   float r_max = femc_rmax1;
@@ -49,6 +78,7 @@ makeMapping_FEMC()
 	  /* Calculate center position for tower */
 	  double xpos = xpos_j0_k0 + idx_j * tower_dx;
 	  double ypos = ypos_j0_k0 + idx_k * tower_dx;
+	  double zpos = 0;
 
 	  /* check if tower extends beyond calorimeter envelope volume */
 	  double tower_rpos = sqrt( xpos * xpos + ypos * ypos );
@@ -59,8 +89,9 @@ makeMapping_FEMC()
 	  if ( tower_r_clear_min < r_min || tower_r_clear_max > r_max )
 	    continue;
 
-	  fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0 0" << endl;
+	  //fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0 0" << endl;
 
+	  fout << "Tower " << 0 << " " << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0" << endl;
 	}
 
     }
