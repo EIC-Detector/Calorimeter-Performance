@@ -123,26 +123,37 @@ int G4CaloTowerAnalysis::process_event( PHCompositeNode* topNode )
   _nevent++;
 
   /* Get truth info */
-  PHG4TruthInfoContainer::Map map = _truth_info_container->GetPrimaryMap();
-
-  // select first primary particle in map- assume single-particle event (particle gun)
-  PHG4Particle* primary = map.begin()->second;
+  PHG4TruthInfoContainer::ConstRange range = _truth_info_container->GetPrimaryParticleRange();
 
   _nprimary = 1;
 
-  _gparticleID[_nprimary-1] = primary->get_track_id();
-  _gflavor[_nprimary-1] = primary->get_pid();
+  // select first primary particle in map- assume single-particle event (particle gun)
+  for (PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter)
+    {
+      PHG4Particle* primary = iter->second;
 
-  _gpx[_nprimary-1] = primary->get_px();
-  _gpy[_nprimary-1] = primary->get_py();
-  _gpz[_nprimary-1] = primary->get_pz();
-  _ge[_nprimary-1] = primary->get_e();
+      /* Only store primaries up to number _nprimary for each event */
+      if ( _nprimary > _maxprimary )
+	{
+	  break;
+	}
 
-  _gp[_nprimary-1] = sqrt(_gpx[_nprimary-1] *_gpx[_nprimary-1] +_gpy[_nprimary-1] *_gpy[_nprimary-1] +_gpz[_nprimary-1] *_gpz[_nprimary-1] );
-  _gpt[_nprimary-1] = sqrt(_gpx[_nprimary-1] *_gpx[_nprimary-1] +_gpy[_nprimary-1] *_gpy[_nprimary-1] );
+      _gparticleID[_nprimary-1] = primary->get_track_id();
+      _gflavor[_nprimary-1] = primary->get_pid();
 
-  _geta[_nprimary-1] = atanh( _gpz[_nprimary-1] /_gp[_nprimary-1] );
-  _gphi[_nprimary-1] = atan2( _gpy[_nprimary-1] , _gpx[_nprimary-1] );
+      _gpx[_nprimary-1] = primary->get_px();
+      _gpy[_nprimary-1] = primary->get_py();
+      _gpz[_nprimary-1] = primary->get_pz();
+      _ge[_nprimary-1] = primary->get_e();
+
+      _gp[_nprimary-1] = sqrt(_gpx[_nprimary-1] *_gpx[_nprimary-1] +_gpy[_nprimary-1] *_gpy[_nprimary-1] +_gpz[_nprimary-1] *_gpz[_nprimary-1] );
+      _gpt[_nprimary-1] = sqrt(_gpx[_nprimary-1] *_gpx[_nprimary-1] +_gpy[_nprimary-1] *_gpy[_nprimary-1] );
+
+      _geta[_nprimary-1] = atanh( _gpz[_nprimary-1] /_gp[_nprimary-1] );
+      _gphi[_nprimary-1] = atan2( _gpy[_nprimary-1] , _gpx[_nprimary-1] );
+
+      _nprimary++;
+    }
 
   /* loop over all towers in the event from this container */
   RawTowerContainer::ConstIterator towerit;
