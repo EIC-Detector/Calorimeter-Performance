@@ -14,12 +14,12 @@ makeMapping_FHCAL()
   float hhcal_rmax1 = 262.0; // cm
   float hhcal_rmin2 = 5.0; // cm
   float hhcal_rmax2 = 336.9.0; // cm
-  float hhcal_dz = 100; // cm
+  float hhcal_dz = 100.0; // cm (FULL SIZE)
 
   /* Tower parameters */
   float tower_dx = 10.0; // cm
   float tower_dy = 10.0; // cm
-  float tower_dz = 100.0; // cm
+  float tower_dz = 100.0; // cm (FULL SIZE)
 
   // assume center tower is centered at (0,0)
   // find index of 'theoretical' center tower on chessboard

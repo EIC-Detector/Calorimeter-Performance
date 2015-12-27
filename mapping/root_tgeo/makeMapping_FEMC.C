@@ -14,13 +14,13 @@ makeMapping_FEMC()
   float femc_rmax1 = 153.73; // cm
   float femc_rmin2 = 12.06; // cm
   float femc_rmax2 = 172.90; // cm
-  float femc_dz = 36.5; // cm
+  float femc_dz = 36.5; // cm (FULL SIZE)
 
   /* Tower parameters */
   // From PHENIX EMCal JGL 12/27/2015
   float tower_dx = 5.535; // cm
   float tower_dy = 5.535; // cm
-  float tower_dz = 36.3; // cm
+  float tower_dz = 36.3; // cm (FULL SIZE)
 
   unsigned n_towers_j = 200;
   unsigned n_towers_k = n_towers_j;
