@@ -13,7 +13,7 @@ makeMapping_FHCAL()
   float hhcal_rmin1 = 5.0; // cm
   float hhcal_rmax1 = 262.0; // cm
   float hhcal_rmin2 = 5.0; // cm
-  float hhcal_rmax2 = 336.9.0; // cm
+  float hhcal_rmax2 = 336.9; // cm
   float hhcal_dz = 100.0; // cm (FULL SIZE)
 
   /* Tower parameters */
