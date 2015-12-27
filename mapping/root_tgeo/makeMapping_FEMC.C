@@ -3,23 +3,24 @@ makeMapping_FEMC()
   /* Global detector position / transformation */
   float femc_x0 =  0.0; // cm,
   float femc_y0 =  0.0; // cm,
-  float femc_z0 = 315.0; // cm,
+  float femc_z0 = 310.0; // cm,
 
   float femc_rot_x0 =  0.0;
   float femc_rot_y0 =  0.0;
   float femc_rot_z0 =  0.0;
 
-  /* Detector envelope size (conde shape) */
-  float femc_rmin1 = 11; // cm
-  float femc_rmax1 = 225; // cm
-  float femc_rmin2 = 12; // cm
-  float femc_rmax2 = 246; // cm
-  float femc_dz = 17; // cm
+  /* Detector envelope size (cone shape) */
+  float femc_rmin1 = 10.73; // cm
+  float femc_rmax1 = 153.73; // cm
+  float femc_rmin2 = 12.06; // cm
+  float femc_rmax2 = 172.90; // cm
+  float femc_dz = 36.5; // cm
 
   /* Tower parameters */
-  float tower_dx = 3.0; // cm
-  float tower_dy = 3.0; // cm
-  float tower_dz = 17.0; // cm
+  // From PHENIX EMCal JGL 12/27/2015
+  float tower_dx = 5.535; // cm
+  float tower_dy = 5.535; // cm
+  float tower_dz = 36.3; // cm
 
   unsigned n_towers_j = 200;
   unsigned n_towers_k = n_towers_j;
