@@ -9,17 +9,17 @@ makeMapping_FHCAL()
   float hhcal_rot_y0 =  0.0;
   float hhcal_rot_z0 =  0.0;
 
-  /* Detector envelope size (conde shape) */
+  /* Detector envelope size (cone shape) */
   float hhcal_rmin1 = 5.0; // cm
   float hhcal_rmax1 = 262.0; // cm
   float hhcal_rmin2 = 5.0; // cm
-  float hhcal_rmax2 = 336.9.0; // cm
-  float hhcal_dz = 100; // cm
+  float hhcal_rmax2 = 262.0; // cm
+  float hhcal_dz = 100.0; // cm (FULL SIZE)
 
   /* Tower parameters */
   float tower_dx = 10.0; // cm
   float tower_dy = 10.0; // cm
-  float tower_dz = 100.0; // cm
+  float tower_dz = 100.0; // cm (FULL SIZE)
 
   // assume center tower is centered at (0,0)
   // find index of 'theoretical' center tower on chessboard
@@ -29,7 +29,7 @@ makeMapping_FHCAL()
   unsigned j_center = n_towers_j / 2 + 1;
   unsigned k_center = j_center;
  
-  float xpos_j0_k0 = -1 * ( (float)( n_towers_j - 1 ) / 2 ) * tower_dx - tower_dx;;
+  float xpos_j0_k0 = -1 * ( (float)( n_towers_j - 1 ) / 2 ) * tower_dx - tower_dx;
   float ypos_j0_k0 = xpos_j0_k0;
 
   cout << "n_towers_j = " << n_towers_j << endl;
@@ -62,6 +62,7 @@ makeMapping_FHCAL()
   /* Tower mapping */
   fout << "#Tower type,idx_j,idx_k,idx_l,x[cm],y[cm],z[cm],dx[cm],dy[cm],dz[cm],rot_x,rot_y,rot_z" << endl;
 
+  unsigned int twr_count = 0; 
   unsigned idx_l = 0;
 
   for (unsigned idx_j = 0; idx_j < n_towers_j; idx_j++)
@@ -94,14 +95,16 @@ makeMapping_FHCAL()
 	  if ( idx_j == j_center && idx_k == k_center )
 	    continue;
 
-	  //	  fout << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0 0" << endl;
-
 	  fout << "Tower " << 0 << " " << idx_j << " " << idx_k << " " << idx_l << " " << xpos << " " << ypos << " " << zpos << " " << tower_dx << " " << tower_dy << " " << tower_dz << " 0 0 0" << endl;
+	  
+	  twr_count++; 
 
 	}
 
     }
 
   fout.close();
+
+  cout << "Placed " << twr_count << " towers in mapping file." << endl; 
 
 }
