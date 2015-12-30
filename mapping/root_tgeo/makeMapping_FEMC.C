@@ -1,33 +1,83 @@
-makeMapping_FEMC()
+makeMapping_FEMC( string setup="PHENIXEMCal" )
 {
-  /* Global detector position / transformation */
-  double femc_x0 =  0.0; // cm,
-  double femc_y0 =  0.0; // cm,
-  double femc_z0 = 310.0; // cm,
 
-  double femc_rot_x0 =  0.0;
-  double femc_rot_y0 =  0.0;
-  double femc_rot_z0 =  0.0;
+  /* Global detector position / transformation */
+  double femc_x0 = 0.0; // cm,
+  double femc_y0 = 0.0; // cm,
+  double femc_z0 = 0.0; // cm,
+
+  double femc_rot_x0 = 0.0;
+  double femc_rot_y0 = 0.0;
+  double femc_rot_z0 = 0.0;
 
   /* Detector envelope size (cone shape) */
-  double femc_rmin1 = 5.0; // cm
-  double femc_rmax1 = 182.655; // cm
-  double femc_rmin2 = 5.0; // cm
-  double femc_rmax2 = 182.655; // cm
-  double femc_dz = 36.5; // cm (FULL SIZE)
+  double femc_rmin1 = 0; // cm
+  double femc_rmax1 = 0; // cm
+  double femc_rmin2 = 0; // cm
+  double femc_rmax2 = 0; // cm
+  double femc_dz = 0; // cm
 
   /* Tower parameters */
-  // From PHENIX EMCal JGL 12/27/2015
-  double tower_dx = 5.535; // cm
-  double tower_dy = 5.535; // cm
-  double tower_dz = 36.3; // cm (FULL SIZE)
+  double tower_dx = 0.0; // cm
+  double tower_dy = 0.0; // cm
+  double tower_dz = 0.0; // cm
+
+  cout << "Setup selected: " << setup << endl;
+
+  if ( setup == "PHENIXEMCal" )
+    {
+      /* Global detector position / transformation */
+      femc_x0 =  0.0; // cm,
+      femc_y0 =  0.0; // cm,
+      femc_z0 = 310.0; // cm,
+
+      femc_rot_x0 =  0.0;
+      femc_rot_y0 =  0.0;
+      femc_rot_z0 =  0.0;
+
+      /* Detector envelope size (cone shape) */
+      femc_rmin1 = 5.0; // cm
+      femc_rmax1 = 182.655; // cm
+      femc_rmin2 = 5.0; // cm
+      femc_rmax2 = 182.655; // cm
+      femc_dz = 36.5; // cm (FULL SIZE)
+
+      /* Tower parameters */
+      // From PHENIX EMCal JGL 12/27/2015
+      tower_dx = 5.535; // cm
+      tower_dy = 5.535; // cm
+      tower_dz = 36.3; // cm (FULL SIZE)
+    }
+  else if ( setup == "EIC_v1" )
+    {
+      /* Global detector position / transformation */
+      femc_x0 =  0.0; // cm,
+      femc_y0 =  0.0; // cm,
+      femc_z0 = 315.0; // cm,
+
+      femc_rot_x0 =  0.0;
+      femc_rot_y0 =  0.0;
+      femc_rot_z0 =  0.0;
+
+      /* Detector envelope size (cone shape) */
+      femc_rmin1 = 11; // cm
+      femc_rmax1 = 225; // cm
+      femc_rmin2 = 12; // cm
+      femc_rmax2 = 246; // cm
+      femc_dz = 17; // cm
+
+      /* Tower parameters */
+      tower_dx = 3.0; // cm
+      tower_dy = 3.0; // cm
+      tower_dz = 17.0; // cm
+    }
 
   // NOTE: code below assumes tower_dx = tower_dy
   // Will need to be updated if that's not the case JGL 12/27/2015
   unsigned n_towers_j = 2 * ( (unsigned)( (femc_rmax1/tower_dx) ));
   unsigned n_towers_k = n_towers_j;
 
-  double xpos_j0_k0 = (-1 * ( (float)( n_towers_j - 1 ) / 2 ) * tower_dx) + 0.5*tower_dx;
+  double xpos_j0_k0 = (-1 * ( (double)( n_towers_j - 1 ) / 2 ) * tower_dx) + 0.5*tower_dx;
   double ypos_j0_k0 = xpos_j0_k0;
 
   cout << "n_towers_j = " << n_towers_j << endl;
